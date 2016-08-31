@@ -1,5 +1,4 @@
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.Scanner;
 
 /**
@@ -40,7 +39,32 @@ public class ManejadorArchivos {
 
             linea.setLineaOriginal(lector.nextLine());
             linea.setNumeroLinea(numLinea);
-            linea.analizar_linea();
+
+            if(linea.analizar_linea()){
+                //escribir en archivo correcto
+                if( !linea.es_comentario() ){
+                    File ins = new File(ruta.split(".")[0] + ".INS");
+                    try {
+                        BufferedWriter salidaInstrucciones = new BufferedWriter(new FileWriter(ins));
+                        salidaInstrucciones.write(linea.getNumeroLinea() + "    " + linea.getLineaOriginal() );
+                    } catch (IOException e) {
+                        //e.printStackTrace();
+                        System.out.println("Problema al crear archivo de instrucciones");
+                    }
+                }
+
+            }else {
+                //escribir en archivo de errores
+
+                File ins = new File(ruta.split(".")[0] + ".ERR");
+                try {
+                    BufferedWriter salidaErrores = new BufferedWriter( new FileWriter(ins) );
+
+                } catch (IOException e) {
+                    //e.printStackTrace();
+                    System.out.println("Problema al crear archivo de errores");
+                }
+            }
         }
     }
 

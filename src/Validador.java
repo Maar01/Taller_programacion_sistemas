@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
     private static final String OPERANDO = ".{1,}";//
     private static final String COMENTARIO = "^[;]{1}.*";//
 
-    //Posiciones en linea que le corresponde a cada token
+    //Posiciones en arreglo que le corresponde a cada token generado por linea.split()
     public  static final   byte POSICION_ETIQUETA = 0;
     public  static final   byte    POSICION_CODOP = 1;
     public  static final   byte POSICION_OPERANDO = 2;
@@ -22,6 +22,11 @@ import java.util.regex.Pattern;
     public static final byte     ETQ_CODOP = 1;
     public static final byte     _CODOP_OP = 2;
     public static final byte       _CODOP_ = 3;
+
+    //Tipos de archivo
+    public static final byte ARCHIVO_ERRORES = 0;
+    public static final byte     ARCHIVO_ASM = 1;
+    public static final byte    ARCHIVO_INST = 2;
 
 
     public static boolean  es_comentario(String token){
@@ -54,8 +59,19 @@ import java.util.regex.Pattern;
     }
 
     public static byte tipo_de_linea( String[] tokens ) {
-        if(){
+        if( tokens.length == 3 ){
+            if( tokens[POSICION_ETIQUETA].equals("") ) {
+                return _CODOP_OP;
+            }else {
+                return ETQ_CODOP_OP;
+            }
+        }else if( tokens.length == 2 ) {
 
+            if( tokens[POSICION_ETIQUETA].equals("") ) {
+                return _CODOP_;
+            }else {
+                return ETQ_CODOP;
+            }
         }
         return 0;
     }
