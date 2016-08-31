@@ -18,14 +18,13 @@ public class ManejadorArchivos {
         this.ruta = ruta;
         cantidadLineas = 0;
         tronador = new File(ruta);
+        //procesa_lineas(tronador);
 
-        try {
-            lector = new Scanner(tronador);
-            set_cantidadLineas();
-        } catch (FileNotFoundException e) {
-            //e.printStackTrace();
-            System.out.println("El archivo no existe. Verifique la ruta ingresada.");
-        }
+    }
+
+    public void inicializa_lector() throws FileNotFoundException {
+
+           lector = new Scanner(tronador);
     }
 
     private void set_cantidadLineas(){
@@ -34,10 +33,14 @@ public class ManejadorArchivos {
         }
     }
 
-    private void analizar_lineas(){
+    public void analizar_lineas(){
         Linea linea = new Linea();
+        short numLinea = 0;
         while ( lector.hasNextLine() ) {
+
             linea.setLineaOriginal(lector.nextLine());
+            linea.setNumeroLinea(numLinea);
+            linea.analizar_linea();
         }
     }
 

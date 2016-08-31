@@ -2,12 +2,14 @@
  * Created by mario on 28/08/16.
  */
 public class Linea {
+
     private String lineaOriginal;
     private String codop;
     private String etq;
     private String oper;
-    private   byte numeroLinea;
+    private  short numeroLinea;
     private String lineaCopia;
+    private boolean comentario = false;
 
 
     private String tokens[];
@@ -20,43 +22,43 @@ public class Linea {
 
     Linea(){    }
 
-    public String getLineaOriginal() {
-        return lineaOriginal;
+    public void setLineaOriginal(String lineaOriginal) {
+
+        this.lineaOriginal = lineaOriginal;
+        this.setLineaCopia(lineaOriginal);
     }
 
-    public void setLineaOriginal(String lineaOriginal) {
-        this.lineaOriginal = lineaOriginal;
+    private void set_tokens(){
+        this.tokens = lineaCopia.split("\\s+");
+           this.etq = tokens[Validador.POSICION_ETIQUETA];
+         this.codop = tokens[Validador.POSICION_CODOP];
+          this.oper = tokens[Validador.POSICION_OPERANDO];
+    }
+
+    public String getLineaOriginal() {
+        return lineaOriginal;
     }
 
     public String getCodop() {
         return codop;
     }
 
-    public void setCodop(String codop) {
-        this.codop = codop;
-    }
 
     public String getEtq() {
         return etq;
     }
 
-    public void setEtq(String etq) {
-        this.etq = etq;
-    }
 
     public String getOper() {
         return oper;
     }
 
-    public void setOper(String oper) {
-        this.oper = oper;
-    }
 
-    public byte getNumeroLinea() {
+    public short getNumeroLinea() {
         return numeroLinea;
     }
 
-    public void setNumeroLinea(byte numeroLinea) {
+    public void setNumeroLinea(short numeroLinea) {
         this.numeroLinea = numeroLinea;
     }
 
@@ -68,4 +70,41 @@ public class Linea {
         this.lineaCopia = lineaCopia;
     }
 
+    public boolean analizar_linea() {
+        byte estado = 0;
+
+        if( Validador.es_comentario(this.lineaCopia) ){
+            comentario = true;
+            return comentario;
+        }else{
+            this.set_tokens();
+            //this.muestra_tokens();
+
+
+
+
+
+        }
+
+        return false;
+    }
+
+    public void showln(String texto) {
+        System.out.println(texto);
+    }
+
+    public void show(String texto) {
+        System.out.print(texto);
+    }
+
+    public void muestra_tokens(){
+        for(int i = 0; i < tokens.length; i++){
+            if( tokens[i].equals("") ){
+                show("espacio 'vacio' ");
+            }else{
+                System.out.print(tokens[i] + " ");
+            }
+        }
+        showln( "# tokens = " + tokens.length);
+    }
 }
