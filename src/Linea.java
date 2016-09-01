@@ -9,10 +9,11 @@ public class Linea {
     private String oper;
     private  short numeroLinea;
     private String lineaCopia;
-    private boolean comentario = false;
-    private boolean        end = false;
-    private byte     tipoLinea = Validador.ETQ_CODOP_OP;
-    private String       error = "";
+    private boolean   comentario = false;
+    private boolean          end = false;
+    private byte       tipoLinea = Validador.ETQ_CODOP_OP;
+    private String         error = "";
+    private String comentarioStr = "";
 
 
     private String tokens[];
@@ -37,11 +38,28 @@ public class Linea {
             this.etq = tokens[Validador.POSICION_ETIQUETA];
             this.codop = tokens[Validador.POSICION_CODOP];
             this.oper = tokens[Validador.POSICION_OPERANDO];
-        }else {
+        }else if ( tokens.length == 4 ) {
             this.etq = tokens[Validador.POSICION_ETIQUETA];
             this.codop = tokens[Validador.POSICION_CODOP];
+            this.oper = tokens[Validador.POSICION_OPERANDO];
+            this.comentarioStr = tokens[Validador.POSICION_COMENTARIO];
+        }else if( tokens.length > 4 ){
+            this.etq = tokens[Validador.POSICION_ETIQUETA];
+            this.codop = tokens[Validador.POSICION_CODOP];
+            this.oper = tokens[Validador.POSICION_OPERANDO];
+            this.comentarioStr = tokens[Validador.POSICION_COMENTARIO];
+            for(byte index = Validador.POSICION_COMENTARIO; index < tokens.length; index++ ){
+                this.comentarioStr += tokens[index];
+            }
         }
-
+        else if( tokens.length == 1){
+            this.etq   = tokens[Validador.POSICION_ETIQUETA];
+        } else{
+            showln("" + tokens.length);
+            this.etq   = tokens[Validador.POSICION_ETIQUETA];
+            this.codop = tokens[Validador.POSICION_CODOP];
+        }
+        muestra_tokens();
     }
 
     public String getLineaOriginal() {
@@ -82,9 +100,9 @@ public class Linea {
     public boolean analizar_linea() {
         byte estado = 0;
 
-        if( Validador.es_comentario(this.lineaCopia) ){
+        if( Validador.es_comentario(this.lineaOriginal) ){
             comentario = true;
-            return comentario;
+            return false;
         }else{
             this.set_tokens();
             //this.muestra_tokens();
@@ -93,41 +111,65 @@ public class Linea {
             switch ( this.tipoLinea ) {
 
                 case Validador.ETQ_CODOP_OP:
-                    showln("ETQ_CODOP_OP");
-
-                    if( Validador.es_etiqueta(tokens[Validador.POSICION_ETIQUETA]) &&
-                        Validador.es_codop(tokens[Validador.POSICION_CODOP]) &&
-                        Validador.es_operando(tokens[Validador.POSICION_OPERANDO])    ) {
-                            return true;
-                    }
+                   // showln("ETQ_CODOP_OP");
+                    
+                    if( Validador.es_etiqueta(tokens[Validador.POSICION_ETIQUETA]) ){
+                        if( Validador.es_codop(tokens[Validador.POSICION_CODOP]) ){
+                            if( Validador.es_operando(tokens[Validador.POSICION_OPERANDO]) ){
+                                return true;
+                                
+                            }else { this.error = "Formato de operando no es correcto "; }//
+                            
+                        }else{ this.error = "Formato de codop no es el adecuado"; }//
+                        
+                    }else{ this.error = "El formato de la etiqueta no es correcto"; }//
 
                     break;
 
                     case Validador.ETQ_CODOP:
-                    showln("ETQ_CODOP");
+                   // showln("ETQ_CODOP");
 
-                    if( Validador.es_etiqueta(tokens[Validador.POSICION_ETIQUETA] ) &&
-                                    Validador.es_codop(tokens[Validador.POSICION_CODOP]) )
-                    {  return true;                                                     }
+                    if( Validador.es_etiqueta(tokens[Validador.POSICION_ETIQUETA] ) ){
+                        if(Validador.es_codop(tokens[Validador.POSICION_CODOP])){
+                            return true;
+                        }
+                    }
 
                     break;
 
                 case Validador._CODOP_OP:
-                    showln("_CODOP_OP");
-                    if( Validador.es_codop(tokens[Validador.POSICION_CODOP]) &&
-                            Validador.es_operando(tokens[Validador.POSICION_OPERANDO]) )
-                    {                      return true;                                 }
+                   // showln("_CODOP_OP");
+                    if(tokens[Validador.POSICION_ETIQUETA].equals("")){
+                        if( Validador.es_codop(tokens[Validador.POSICION_CODOP])) {
+                            if(Validador.es_operando(tokens[Validador.POSICION_OPERANDO])){
+                                return true;
+                            }else{ this.error = "El formato de OPERANDO no es correcto"; }
+                    }else{ this.error = "El formato de CODOP no es correcto"; }
+                }else{ this.error = "El formato de OPERANDO no es correcto"; }
+                            
                     break;
 
                 case Validador._CODOP_:
-                    showln("_CODOP_");
+                   // showln("_CODOP_");
                     if( Validador.es_codop( tokens[Validador.POSICION_CODOP] ) ) {
                         return true;
                     }
                     break;
+
+                case Validador.ETQ_CODOP_OP_COM:
+                    if ( Validador.es_comentario( tokens[Validador.POSICION_COMENTARIO] ) ){
+                        return true;
+                    }else{
+                        this.error = "numero de tokens invalido para la linea";
+                        break;
+                    }
+
+                    //break;
+                default:
+                    this.error = "numero de tokens invalido para la linea";
+                    return false;
             }
         }
-
         return false;
     }
 
@@ -160,5 +202,13 @@ public class Linea {
 
     public void set_tipoLinea(byte tipoLinea ) {
           this.tipoLinea = tipoLinea;
+    }
+
+    public void setComentario(boolean comentario) {
+        this.comentario = comentario;
+    }
+
+    public String getError() {
+        return error;
     }
 }

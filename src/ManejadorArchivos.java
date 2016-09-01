@@ -36,17 +36,24 @@ public class ManejadorArchivos {
         Linea linea = new Linea();
         short numLinea = 0;
         while ( lector.hasNextLine() ) {
-
+            numLinea++;
             linea.setLineaOriginal(lector.nextLine());
+            linea.setComentario(false);
             linea.setNumeroLinea(numLinea);
 
             if(linea.analizar_linea()){
                 //escribir en archivo correcto
-                if( !linea.es_comentario() ){
-                    File ins = new File(ruta.split(".")[0] + ".INS");
+                if( linea.es_comentario() ){
+
+                }else{
+                    File ins = new File("/home/mario/IdeaProjects/Programación de sistemas/test" + ".INS");
+
                     try {
-                        BufferedWriter salidaInstrucciones = new BufferedWriter(new FileWriter(ins));
-                        salidaInstrucciones.write(linea.getNumeroLinea() + "    " + linea.getLineaOriginal() );
+                        BufferedWriter salidaInstrucciones = new BufferedWriter(new FileWriter(ins, true));
+                       // System.out.println( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() );
+                        salidaInstrucciones.write(linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "\n" );
+                        salidaInstrucciones.close();
+
                     } catch (IOException e) {
                         //e.printStackTrace();
                         System.out.println("Problema al crear archivo de instrucciones");
@@ -56,14 +63,23 @@ public class ManejadorArchivos {
             }else {
                 //escribir en archivo de errores
 
-                File ins = new File(ruta.split(".")[0] + ".ERR");
-                try {
-                    BufferedWriter salidaErrores = new BufferedWriter( new FileWriter(ins) );
+                File ins = new File("/home/mario/IdeaProjects/Programación de sistemas/test" + ".ERR");
+                if( linea.es_comentario() ){
 
-                } catch (IOException e) {
-                    //e.printStackTrace();
-                    System.out.println("Problema al crear archivo de errores");
+                }else{
+                    try {
+
+                        BufferedWriter salidaInstrucciones = new BufferedWriter(new FileWriter(ins, true));
+                        //System.out.println( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() );
+                        salidaInstrucciones.write(linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
+                        salidaInstrucciones.close();
+
+                    } catch (IOException e) {
+                        //e.printStackTrace();
+                        System.out.println("Problema al crear archivo de instrucciones");
+                    }
                 }
+
             }
         }
     }
