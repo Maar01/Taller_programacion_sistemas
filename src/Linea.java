@@ -4,7 +4,7 @@
 public class Linea {
 
     private String lineaOriginal;
-    private String codop;
+    private String codop = "";
     private String etq;
     private String oper;
     private  short numeroLinea;
@@ -34,6 +34,7 @@ public class Linea {
 
     private void set_tokens(){
         this.tokens = lineaCopia.split("\\s+");
+
         if( tokens.length == 3 ) {
             this.etq = tokens[Validador.POSICION_ETIQUETA];
             this.codop = tokens[Validador.POSICION_CODOP];
@@ -59,7 +60,7 @@ public class Linea {
             this.etq   = tokens[Validador.POSICION_ETIQUETA];
             this.codop = tokens[Validador.POSICION_CODOP];
         }
-        muestra_tokens();
+
     }
 
     public String getLineaOriginal() {
@@ -98,76 +99,98 @@ public class Linea {
     }
 
     public boolean analizar_linea() {
-        byte estado = 0;
 
         if( Validador.es_comentario(this.lineaOriginal) ){
             comentario = true;
             return false;
         }else{
             this.set_tokens();
-            //this.muestra_tokens();
             this.set_tipoLinea(Validador.tipo_de_linea(tokens));
-
+            muestra_tokens();
+            showln(" " + tipoLinea);
             switch ( this.tipoLinea ) {
 
                 case Validador.ETQ_CODOP_OP:
-                   // showln("ETQ_CODOP_OP");
-                    
                     if( Validador.es_etiqueta(tokens[Validador.POSICION_ETIQUETA]) ){
                         if( Validador.es_codop(tokens[Validador.POSICION_CODOP]) ){
                             if( Validador.es_operando(tokens[Validador.POSICION_OPERANDO]) ){
                                 return true;
                                 
-                            }else { this.error = "Formato de operando no es correcto "; }//
+                            }else { this.error = " Formato de operando no es correcto "; }//
                             
-                        }else{ this.error = "Formato de codop no es el adecuado"; }//
+                        }else{ this.error = " Formato de codop no es el adecuado"; }//
                         
-                    }else{ this.error = "El formato de la etiqueta no es correcto"; }//
+                    }else{ this.error = " El formato de la etiqueta no es correcto"; }//
 
                     break;
 
                     case Validador.ETQ_CODOP:
-                   // showln("ETQ_CODOP");
-
                     if( Validador.es_etiqueta(tokens[Validador.POSICION_ETIQUETA] ) ){
-                        if(Validador.es_codop(tokens[Validador.POSICION_CODOP])){
-                            return true;
-                        }
-                    }
+                        if(tokens.length > 1){
+                            if(Validador.es_codop(tokens[Validador.POSICION_CODOP])){
+                                return true;
+                            }else { this.error = " Error en el formato de CODOP"; }
+                        }else{ this.error = " No puede ir solo una etiqueta "; }
+                    }else { this.error = " Formato incorrecto de etiqueta" ; }
 
                     break;
 
                 case Validador._CODOP_OP:
-                   // showln("_CODOP_OP");
                     if(tokens[Validador.POSICION_ETIQUETA].equals("")){
                         if( Validador.es_codop(tokens[Validador.POSICION_CODOP])) {
                             if(Validador.es_operando(tokens[Validador.POSICION_OPERANDO])){
                                 return true;
-                            }else{ this.error = "El formato de OPERANDO no es correcto"; }
-                    }else{ this.error = "El formato de CODOP no es correcto"; }
-                }else{ this.error = "El formato de OPERANDO no es correcto"; }
+                            }else{ this.error = " El formato de OPERANDO no es correcto"; }
+                    }else{ this.error = " El formato de CODOP no es correcto"; }
+                }else{ this.error = " El formato de OPERANDO no es correcto"; }
                             
                     break;
 
                 case Validador._CODOP_:
-                   // showln("_CODOP_");
                     if( Validador.es_codop( tokens[Validador.POSICION_CODOP] ) ) {
                         return true;
-                    }
+                    }else{ this.error = " El formato del CODOP no es correcto" ;}
                     break;
 
                 case Validador.ETQ_CODOP_OP_COM:
                     if ( Validador.es_comentario( tokens[Validador.POSICION_COMENTARIO] ) ){
                         return true;
+                    }else if( tokens[Validador.POSICION_OPERANDO].contains(";") ){
+                        String tokens2[] = tokens[Validador.POSICION_OPERANDO].split(";");
+                        tokens[Validador.POSICION_OPERANDO] = tokens2[0];
+                        tokens[Validador.POSICION_COMENTARIO] = tokens2[1] + " " +
+                                tokens[Validador.POSICION_COMENTARIO];
+
+                        for(int i = Validador.POSICION_COMENTARIO + 1; i < tokens.length; i++){
+                            tokens[Validador.POSICION_COMENTARIO] += " " + tokens[i]   ;
+                        }
+
+                        return true;
+
                     }else{
-                        this.error = "numero de tokens invalido para la linea";
+                        for(int index = 0; index < tokens.length; index++){
+                            if(tokens[index].equals("")){
+
+                            }else{
+                                if(Validador.es_comentario(tokens[index])){
+                                    for(int i = index; i < tokens.length; i++){
+                                        tokens[index] =  tokens[i] ;
+                                    }
+                                    comentario = true;
+                                    return false;
+                                }
+                            }
+                        }
+                        this.error = " número de tokens invalido para la linea";
                         break;
                     }
 
+                case Validador.ETQ_:
+                    this.error = " No es posible sólo tener una etiqueta en la línea";
+                    return false;
                     //break;
                 default:
-                    this.error = "numero de tokens invalido para la linea";
-                    return false;
+                    this.error = " número de tokens invalido para la linea";
             }
         }
         return false;
@@ -186,18 +209,13 @@ public class Linea {
             if( tokens[i].equals("") ){
                 show("espacio 'vacio' ");
             }else{
-                System.out.print(tokens[i] + " ");
+                System.out.print(tokens[i] + " " );
             }
         }
-        showln( "# tokens = " + tokens.length);
     }
 
     public boolean es_comentario(){
         return comentario;
-    }
-
-    public byte get_tipoLinea(  ) {
-        return  this.tipoLinea;
     }
 
     public void set_tipoLinea(byte tipoLinea ) {

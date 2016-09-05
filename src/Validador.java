@@ -4,10 +4,10 @@ import java.util.regex.Pattern;
 /**
  * Created by mario on 28/08/16.
  */
- public final class Validador {
+public final class Validador {
 
      //REGEX
-    private static final String ETIQUETA = "^([a-zA-Z]){1}[\\w]{1,7}";//
+    private static final String ETIQUETA = "^([a-zA-Z]){1}[\\w]{0,7}";//
     private static final String CODOP = "([a-zA-Z]){1,5}\\.?";//
     private static final String OPERANDO = ".{1,}";//
     private static final String COMENTARIO = "^[;]{1}.*";//
@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
     public static final byte         ETQ_CODOP = 1;
     public static final byte         _CODOP_OP = 2;
     public static final byte           _CODOP_ = 3;
+    public static final byte              ETQ_ = 98;
     public static final byte  ETQ_CODOP_OP_COM = 99;
     //Tipos de archivo
     public static final byte ARCHIVO_ERRORES = 0;
@@ -31,7 +32,9 @@ import java.util.regex.Pattern;
 
 
     public static boolean  es_comentario(String token){
-
+        if(token.equals("")){
+            return true;
+        }
         Pattern patron = Pattern.compile(COMENTARIO);
         Matcher matcher = patron.matcher(token);
 
@@ -60,6 +63,7 @@ import java.util.regex.Pattern;
     }
 
     public static byte tipo_de_linea( String[] tokens ) {
+
         if( tokens.length == 3 ){
             if( tokens[POSICION_ETIQUETA].equals("") ) {
                 return _CODOP_OP;
@@ -74,10 +78,13 @@ import java.util.regex.Pattern;
                 return ETQ_CODOP;
             }
         }else if( tokens.length == 4 || tokens.length > 3 ){
+
                 return ETQ_CODOP_OP_COM;
+        }else if( tokens.length == 1 ){
+
+            return ETQ_; // Error de sólo etiqueta
         }
-        //si llega aqui quiere decir que la longitud del arreglo tokens es mayor a 3 lo cual es invalido
-        //siempre y cuando no sea un comentario el último token
+
         return (byte) tokens.length;
     }
 }

@@ -35,7 +35,7 @@ public class ManejadorArchivos {
     public void analizar_lineas(){
         Linea linea = new Linea();
         short numLinea = 0;
-        while ( lector.hasNextLine() ) {
+        while ( linea.getCodop() != "END" && lector.hasNextLine() ) {
             numLinea++;
             linea.setLineaOriginal(lector.nextLine());
             linea.setComentario(false);
@@ -43,26 +43,28 @@ public class ManejadorArchivos {
 
             if(linea.analizar_linea()){
                 //escribir en archivo correcto
-                if( linea.es_comentario() ){
+                if( linea.es_comentario() || linea.getLineaOriginal().isEmpty() ){
 
                 }else{
                     File ins = new File("/home/mario/IdeaProjects/Programación de sistemas/test" + ".INS");
 
                     try {
                         BufferedWriter salidaInstrucciones = new BufferedWriter(new FileWriter(ins, true));
-                       // System.out.println( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() );
                         salidaInstrucciones.write(linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "\n" );
                         salidaInstrucciones.close();
+                        if( linea.getCodop().contains("END")  ){
+                            break;
+                        }
 
                     } catch (IOException e) {
                         //e.printStackTrace();
                         System.out.println("Problema al crear archivo de instrucciones");
                     }
+
                 }
 
             }else {
                 //escribir en archivo de errores
-
                 File ins = new File("/home/mario/IdeaProjects/Programación de sistemas/test" + ".ERR");
                 if( linea.es_comentario() ){
 
@@ -79,9 +81,7 @@ public class ManejadorArchivos {
                         System.out.println("Problema al crear archivo de instrucciones");
                     }
                 }
-
             }
         }
     }
-
 }
