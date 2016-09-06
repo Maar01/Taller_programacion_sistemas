@@ -18,20 +18,35 @@ public class Linea {
 
     private String tokens[];
 
+    /**
+     *
+     * @param linea
+     */
     Linea(String linea){
         lineaOriginal = linea;
         lineaCopia = lineaOriginal.trim();
         tokens = lineaCopia.split("\\s+");
     }
 
+    /**
+     *
+     */
     Linea(){    }
 
+    /**
+     * inicializa o cambia el valor de lineaOriginal
+     * @param lineaOriginal
+     */
     public void setLineaOriginal(String lineaOriginal) {
 
         this.lineaOriginal = lineaOriginal;
         this.setLineaCopia(lineaOriginal);
     }
 
+    /**
+     * inicializa o cambia el valor de los tokens que componen a la linea
+     * según la posición y cantidad de estos.
+     */
     private void set_tokens(){
         this.tokens = lineaCopia.split("\\s+");
 
@@ -63,41 +78,68 @@ public class Linea {
 
     }
 
+    /**
+     * Regresa el valor actual de lineaOriginal
+     * @return String
+     */
     public String getLineaOriginal() {
         return lineaOriginal;
     }
 
+    /**
+     * Regresa el valor actual del token codop
+     * @return
+     */
     public String getCodop() {
         return codop;
     }
 
-
+    /**
+     * Regresa el valor actual del token etq
+     * @return
+     */
     public String getEtq() {
         return etq;
     }
 
-
+    /**
+     * Regresa el valor actual del token operando
+     * @return
+     */
     public String getOper() {
         return oper;
     }
 
-
+    /**
+     * regresa el número de línea que le corresponde en el archivo .asm
+     * @return
+     */
     public short getNumeroLinea() {
         return numeroLinea;
     }
 
+    /**
+     * inicializa o actualiza el número de línea que corresponde al archivo .asm
+     * @param numeroLinea
+     */
     public void setNumeroLinea(short numeroLinea) {
         this.numeroLinea = numeroLinea;
     }
 
-    public String getLineaCopia() {
-        return lineaCopia;
-    }
 
+    /**
+     * inicializa o cambia el valor de respaldo de la línea original
+     * @param lineaCopia
+     */
     public void setLineaCopia(String lineaCopia) {
         this.lineaCopia = lineaCopia;
     }
 
+    /**
+     * Regresa true en caso de que la línea cumpla con el formato correcto para ser procesada
+     * o false en caso de incumplimiento, además de identificar el tipo de error.
+     * @return
+     */
     public boolean analizar_linea() {
 
         if( Validador.es_comentario(this.lineaOriginal) ){
@@ -106,8 +148,7 @@ public class Linea {
         }else{
             this.set_tokens();
             this.set_tipoLinea(Validador.tipo_de_linea(tokens));
-            muestra_tokens();
-            showln(" " + tipoLinea);
+
             switch ( this.tipoLinea ) {
 
                 case Validador.ETQ_CODOP_OP:
@@ -196,14 +237,26 @@ public class Linea {
         return false;
     }
 
+    /**
+     * Evita la necesidad de escribir la línea completa System.out.println()
+     * @param texto
+     */
     public void showln(String texto) {
         System.out.println(texto);
     }
 
+    /**
+     * Evita la necesidad de escribir la línea completa System.out.print()
+     * @param texto
+     */
     public void show(String texto) {
         System.out.print(texto);
     }
 
+    /**
+     * Imprime en consola los tokens identificados en la línea a partir de
+     * set_token()
+     */
     public void muestra_tokens(){
         for(int i = 0; i < tokens.length; i++){
             if( tokens[i].equals("") ){
@@ -214,18 +267,37 @@ public class Linea {
         }
     }
 
+    /**
+     * Regresa true en caso de que la línea se haya identificado como comentario posterior
+     * a su analisis
+     * @return
+     */
     public boolean es_comentario(){
         return comentario;
     }
 
+    /**
+     * Inicializa o cambia el tipo de línea, que corresponde a los formatos esperados
+     * y definidos en la @clase Validador
+     * @param tipoLinea
+     */
     public void set_tipoLinea(byte tipoLinea ) {
           this.tipoLinea = tipoLinea;
     }
+
+    /**
+     * inicializa o cambia el valor que afirma o niega si la línea actual es comentario
+     * @param comentario
+     */
 
     public void setComentario(boolean comentario) {
         this.comentario = comentario;
     }
 
+    /**
+     * Regresa el error identificado en la línea posterior a su analisis.
+     * @return
+     */
     public String getError() {
         return error;
     }

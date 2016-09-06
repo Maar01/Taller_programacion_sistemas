@@ -8,7 +8,6 @@ public class ManejadorArchivos {
 
     private String  nombre;
     private String  ruta;
-    //private  short  tipoArchivo;
     private Scanner lector;
     private    File tronador;
     private   short cantidadLineas;
@@ -17,21 +16,21 @@ public class ManejadorArchivos {
         this.ruta = ruta;
         cantidadLineas = 0;
         tronador = new File(ruta);
-        //procesa_lineas(tronador);
-
     }
 
+    /**
+     * Crea una instancia de Scanner, que se utilizará para leer archivos
+     * @throws FileNotFoundException
+     */
     public void inicializa_lector() throws FileNotFoundException {
 
            lector = new Scanner(tronador);
     }
 
-    private void set_cantidadLineas(){
-        while( lector.hasNextLine() ) {
-            cantidadLineas++;
-        }
-    }
-
+    /**
+     * Función encargada de escribir u omitir la línea en archivos
+     * según sus propiedades resultantes del analisis.
+     */
     public void analizar_lineas(){
         Linea linea = new Linea();
         short numLinea = 0;
