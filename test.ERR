@@ -1,14 +1,4 @@
-5    ETQ2;invalido No es posible sólo tener una etiqueta en la línea
-6    ETQ3	X,Y;invalido Error en el formato de CODOP
-10    ETQ056789	CODOP	OPER1,OPER2 El formato de la etiqueta no es correcto
-12    1ET COD Formato incorrecto de etiqueta
-13    ET1$A	COP Formato incorrecto de etiqueta
-14    ET 4MOV	1234 Formato de codop no es el adecuado
-15    ET CODIGO Error en el formato de CODOP
-16     COD.OPE	OPERANDO El formato de CODOP no es correcto
-17     M.O.S El formato del CODOP no es correcto
-19    END No es posible sólo tener una etiqueta en la línea
-21     c1c El formato del CODOP no es correcto
-23    ET	CD	OP	OTRO;ERROR número de tokens invalido para la linea
-26      a    b    c número de tokens invalido para la linea
-27    2222   		codop   12345 El formato de la etiqueta no es correcto
+1       NULL     ORG    $AB El codop ORG no utiliza operando
+2       ET1     SWI    $AB El codop SWI no utiliza operando
+1       NULL     ORG    $AB El codop ORG no utiliza operando
+2       ET1     SWI    $AB El codop SWI no utiliza operando

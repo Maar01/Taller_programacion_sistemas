@@ -1,5 +1,5 @@
-
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
 /*
  *   /home/mario/IdeaProjects/Programación de sistemas/test.ASM
@@ -17,11 +17,16 @@ public class Principal {
         ManejadorArchivos manejador;
         boolean repetir = false;
 
+
         do{
+
             System.out.println("Ingresar ruta de archivo .ASM");
             //rutaTronador = lector.nextLine();
             rutaTronador = "/home/mario/IdeaProjects/Programación de sistemas/test.ASM";
             manejador = new ManejadorArchivos(rutaTronador);
+
+
+
 
             try {
                 manejador.inicializa_lector();
@@ -31,7 +36,12 @@ public class Principal {
                 repetir = true;
             }
 
-            manejador.analizar_lineas();
+            try {
+                manejador.analizar_lineas();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }while(repetir == true);
     }
 }

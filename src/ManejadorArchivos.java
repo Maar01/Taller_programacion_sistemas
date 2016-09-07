@@ -11,11 +11,25 @@ public class ManejadorArchivos {
     private Scanner lector;
     private    File tronador;
     private   short cantidadLineas;
+    private Tabop tabop ;
+    private File ins;
+    private File err;
+    private BufferedWriter salidaInstrucciones;
+    private BufferedWriter salidaErrores;
 
     ManejadorArchivos(String ruta){
         this.ruta = ruta;
         cantidadLineas = 0;
         tronador = new File(ruta);
+        tabop = new Tabop();
+          ins = new File("/home/mario/IdeaProjects/Programación de sistemas/test" + ".INS");
+          err = new File("/home/mario/IdeaProjects/Programación de sistemas/test" + ".ERR");
+        try {
+            salidaInstrucciones = new BufferedWriter( new FileWriter( ins, true ) );
+            salidaErrores = new BufferedWriter( new FileWriter( err,true) );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -31,56 +45,82 @@ public class ManejadorArchivos {
      * Función encargada de escribir u omitir la línea en archivos
      * según sus propiedades resultantes del analisis.
      */
-    public void analizar_lineas(){
+    public void analizar_lineas() throws IOException {
+
+        tabop.carga_tabop();
         Linea linea = new Linea();
         short numLinea = 0;
+
         while ( linea.getCodop() != "END" && lector.hasNextLine() ) {
             numLinea++;
             linea.setLineaOriginal(lector.nextLine());
             linea.setComentario(false);
             linea.setNumeroLinea(numLinea);
+            linea.resetLinea();
+            boolean existeCodop = false;
 
-            if(linea.analizar_linea()){
+            if( linea.analizar_linea() ) {
                 //escribir en archivo correcto
                 if( linea.es_comentario() || linea.getLineaOriginal().isEmpty() ){
 
-                }else{
-                    File ins = new File("/home/mario/IdeaProjects/Programación de sistemas/test" + ".INS");
-
-                    try {
-                        BufferedWriter salidaInstrucciones = new BufferedWriter(new FileWriter(ins, true));
-                        salidaInstrucciones.write(linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "\n" );
-                        salidaInstrucciones.close();
-                        if( linea.getCodop().contains("END")  ){
-                            break;
-                        }
-
-                    } catch (IOException e) {
-                        //e.printStackTrace();
-                        System.out.println("Problema al crear archivo de instrucciones");
-                    }
-
                 }
+                else {
+                    //se prepara la línea que se escribirá en el archivo .ins
+                      linea.setLineaEscribir();
 
-            }else {
+                      for(Codop codop : tabop.getTabop()){
+                          //si el codop cargado en memoria desde el tabop.txt es = codop de Linea
+                         if( codop.getCodop().equals( linea.getCodop() )  ){
+
+                             if ( !codop.usaOper() &&
+                                     ( linea.getOper().equals("") || linea.getOper().equals("NULL") ) ){
+                                 existeCodop = true;
+                                 linea.setLineaOriginal( linea.getLineaOriginal() + "   " +  codop.getModoDirec() );
+                             }else if ( codop.usaOper() && //no es nulo o está vacío el operando
+                                     ( !linea.getOper().equals("") && !linea.getOper().equals("NULL") ) ) {
+                                 existeCodop = true;
+                                 linea.setLineaOriginal( linea.getLineaOriginal() + "    " +  codop.getModoDirec() );
+
+                             }else {
+                                 linea.set_error(" El codop " + linea.getCodop() + " no utiliza operando" );
+                                 break;
+                             }
+
+
+                         }
+                      }
+                      /*Si se terminar el ciclo que recorre el arrayList (tabop) y no encontró el codop:
+                      * escribir en el archivo de errores.
+                      * */
+                      if( !existeCodop ){
+                          //linea.set_error(" El código de operación no existe");
+                          salidaErrores.write(linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
+                      }
+                      else{
+                          salidaInstrucciones.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "\n" );
+                      }
+                        /*Si ya se ha leído la etq END terminar el ciclo, además de que el operando debe ser nulo*/
+                      if( linea.getCodop().contains("END") &&
+                              ( linea.getOper().equals( "" ) || linea.getCodop().contains( "NULL" ) ) ){
+                          salidaInstrucciones.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "\n" );
+                           break;
+                      }
+                      else if( linea.getCodop().contains( "END" ) &&
+                              ( !linea.getOper().equals( "" ) && !linea.getCodop().contains( "NULL" ) ) ){
+                          break;
+                      }
+                }
+            }
+            else {
                 //escribir en archivo de errores
-                File ins = new File("/home/mario/IdeaProjects/Programación de sistemas/test" + ".ERR");
-                if( linea.es_comentario() ){
 
-                }else{
-                    try {
-
-                        BufferedWriter salidaInstrucciones = new BufferedWriter(new FileWriter(ins, true));
-                        //System.out.println( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() );
-                        salidaInstrucciones.write(linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
-                        salidaInstrucciones.close();
-
-                    } catch (IOException e) {
-                        //e.printStackTrace();
-                        System.out.println("Problema al crear archivo de instrucciones");
-                    }
+                if( linea.es_comentario() ){/*omitimos acción de escritura*/ }
+                else{
+                    salidaErrores.write(linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
                 }
             }
         }
+        salidaInstrucciones.close();
+        salidaErrores.close();
     }
 }

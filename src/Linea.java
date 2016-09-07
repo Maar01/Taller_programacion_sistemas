@@ -5,8 +5,8 @@ public class Linea {
 
     private String lineaOriginal;
     private String codop = "";
-    private String etq;
-    private String oper;
+    private String   etq = "";
+    private String  oper = "";
     private  short numeroLinea;
     private String lineaCopia;
     private boolean   comentario = false;
@@ -48,34 +48,46 @@ public class Linea {
      * según la posición y cantidad de estos.
      */
     private void set_tokens(){
+
         this.tokens = lineaCopia.split("\\s+");
+        limpiaTokens();
 
         if( tokens.length == 3 ) {
-            this.etq = tokens[Validador.POSICION_ETIQUETA];
+            this.etq   = tokens[Validador.POSICION_ETIQUETA];
             this.codop = tokens[Validador.POSICION_CODOP];
-            this.oper = tokens[Validador.POSICION_OPERANDO];
-        }else if ( tokens.length == 4 ) {
-            this.etq = tokens[Validador.POSICION_ETIQUETA];
+            this.oper  = tokens[Validador.POSICION_OPERANDO];
+        }
+        else if ( tokens.length == 4 ) {
+            this.etq   = tokens[Validador.POSICION_ETIQUETA];
             this.codop = tokens[Validador.POSICION_CODOP];
-            this.oper = tokens[Validador.POSICION_OPERANDO];
+            this.oper  = tokens[Validador.POSICION_OPERANDO];
             this.comentarioStr = tokens[Validador.POSICION_COMENTARIO];
-        }else if( tokens.length > 4 ){
-            this.etq = tokens[Validador.POSICION_ETIQUETA];
+        }
+        else if( tokens.length > 4 ) {
+            this.etq   = tokens[Validador.POSICION_ETIQUETA];
             this.codop = tokens[Validador.POSICION_CODOP];
-            this.oper = tokens[Validador.POSICION_OPERANDO];
+            this.oper  = tokens[Validador.POSICION_OPERANDO];
             this.comentarioStr = tokens[Validador.POSICION_COMENTARIO];
-            for(byte index = Validador.POSICION_COMENTARIO; index < tokens.length; index++ ){
+            for(byte index = Validador.POSICION_COMENTARIO; index < tokens.length; index++ ) {
                 this.comentarioStr += tokens[index];
             }
         }
         else if( tokens.length == 1){
             this.etq   = tokens[Validador.POSICION_ETIQUETA];
-        } else{
-            showln("" + tokens.length);
+        }
+        else {
             this.etq   = tokens[Validador.POSICION_ETIQUETA];
             this.codop = tokens[Validador.POSICION_CODOP];
         }
 
+    }
+
+    private void limpiaTokens() {
+        for(int i = 0; i < tokens.length; i++){
+            if(tokens[i].equals("")){
+                tokens[i] = "NULL";
+            }
+        }
     }
 
     /**
@@ -300,5 +312,20 @@ public class Linea {
      */
     public String getError() {
         return error;
+    }
+
+    public void setLineaEscribir(){
+        lineaOriginal = "   " + etq.trim() + "     " + codop.trim() + "    " + oper.trim();
+    }
+
+    public void set_error( String error ){
+        this.error = error;
+    }
+
+    public void resetLinea(){
+        this.oper  = "NULL";
+        this.codop = "";
+        this.etq   = "NULL";
+        this.error = "";
     }
 }
