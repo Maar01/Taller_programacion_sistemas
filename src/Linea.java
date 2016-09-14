@@ -1,6 +1,11 @@
 /**
  * Created by mario on 28/08/16.
  */
+
+/**
+ * Clase encargada de analizar y almacenar la información resultante
+ * del análisis de cada linea leída desde un .asm
+ */
 public class Linea {
 
     private String lineaOriginal;
@@ -14,7 +19,6 @@ public class Linea {
     private byte       tipoLinea = Validador.ETQ_CODOP_OP;
     private String         error = "";
     private String comentarioStr = "";
-
 
     private String tokens[];
 
@@ -327,5 +331,13 @@ public class Linea {
         this.codop = "";
         this.etq   = "NULL";
         this.error = "";
+    }
+
+    public void setEnd(boolean end) {
+        this.end = end;
+    }
+
+    public boolean getEnd(){
+        return this.end;
     }
 }

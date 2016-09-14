@@ -7,6 +7,11 @@ import java.util.Scanner;
 /**
  * Created by mario on 5/09/16.
  */
+
+/**
+ * Clase encargada de cargar en memoria, desde un archivo, los valores
+ * de TABOP para su posterior y constante consulta.
+ */
 public class Tabop {
     private ArrayList<Codop> tabop;
     private          Scanner lectorTabop;

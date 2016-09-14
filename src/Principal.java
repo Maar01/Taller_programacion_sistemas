@@ -26,8 +26,6 @@ public class Principal {
             manejador = new ManejadorArchivos(rutaTronador);
 
 
-
-
             try {
                 manejador.inicializa_lector();
             } catch (FileNotFoundException e) {

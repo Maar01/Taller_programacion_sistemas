@@ -1,12 +1,17 @@
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+/*Validar que exista un end en el archivo */
 /**
  * Created by mario on 28/08/16.
  */
+
+/**
+ * Clase encargada de verificar formatos tanto de lineas como de tokens con la inclusión de  regex y constantes
+ * para agregar claridad a resultados y métodos.
+ */
 public final class Validador {
 
-     //REGEX
+    //REGEX
     private static final String ETIQUETA = "^([a-zA-Z]){1}[\\w]{0,7}";//
     private static final String CODOP = "([a-zA-Z]){1,5}\\.?";//
     private static final String OPERANDO = ".{1,}";//

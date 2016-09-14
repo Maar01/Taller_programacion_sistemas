@@ -1,4 +1,1 @@
-1       NULL     ORG    $AB El codop ORG no utiliza operando
-2       ET1     SWI    $AB El codop SWI no utiliza operando
-1       NULL     ORG    $AB El codop ORG no utiliza operando
-2       ET1     SWI    $AB El codop SWI no utiliza operando
+1    ORG $AB Error en el formato de CODOP

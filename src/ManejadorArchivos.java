@@ -4,6 +4,11 @@ import java.util.Scanner;
 /**
  * Created by mario on 28/08/16.
  */
+
+/**
+ * Clase encargada de la lectura y escritura de archivos
+ * en base a los resultados del análisis de la clase @Linea
+ * */
 public class ManejadorArchivos {
 
     private String  nombre;
@@ -85,15 +90,13 @@ public class ManejadorArchivos {
                                  linea.set_error(" El codop " + linea.getCodop() + " no utiliza operando" );
                                  break;
                              }
-
-
                          }
                       }
                       /*Si se terminar el ciclo que recorre el arrayList (tabop) y no encontró el codop:
                       * escribir en el archivo de errores.
                       * */
                       if( !existeCodop ){
-                          //linea.set_error(" El código de operación no existe");
+                          linea.set_error(" El código de operación no existe");
                           salidaErrores.write(linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
                       }
                       else{
@@ -102,11 +105,15 @@ public class ManejadorArchivos {
                         /*Si ya se ha leído la etq END terminar el ciclo, además de que el operando debe ser nulo*/
                       if( linea.getCodop().contains("END") &&
                               ( linea.getOper().equals( "" ) || linea.getCodop().contains( "NULL" ) ) ){
+                          linea.setEnd(true);
                           salidaInstrucciones.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "\n" );
+                          System.out.println("Entra al break " + linea.getEnd() );
                            break;
                       }
                       else if( linea.getCodop().contains( "END" ) &&
                               ( !linea.getOper().equals( "" ) && !linea.getCodop().contains( "NULL" ) ) ){
+                          linea.setEnd(true);
+                          System.out.println("Entra al break " + linea.getEnd() );
                           break;
                       }
                 }
@@ -116,9 +123,12 @@ public class ManejadorArchivos {
 
                 if( linea.es_comentario() ){/*omitimos acción de escritura*/ }
                 else{
-                    salidaErrores.write(linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
+                    salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
                 }
             }
+        }//fin while de analisis y escritura
+        if( !linea.getEnd() ){
+            salidaErrores.write( linea.getNumeroLinea() + "     " + "No existe END en el archivo\n" );
         }
         salidaInstrucciones.close();
         salidaErrores.close();

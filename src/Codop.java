@@ -1,6 +1,11 @@
 /**
  * Created by mario on 5/09/16.
  */
+
+/**
+ * Clase encargada de guardar los datos de todo codop
+ * encontrado  en el archivo .asm
+ */
 public class Codop {
 
     private  String modoDirec;
