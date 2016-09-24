@@ -57,6 +57,7 @@ public class ManejadorArchivos {
         short numLinea = 0;
 
         while ( linea.getCodop() != "END" && lector.hasNextLine() ) {
+            boolean escribir = true;
             numLinea++;
             linea.setLineaOriginal(lector.nextLine());
             linea.setComentario(false);
@@ -73,9 +74,9 @@ public class ManejadorArchivos {
                     //se prepara la línea que se escribirá en el archivo .ins
                       linea.setLineaEscribir();
 
-                      for(Codop codop : tabop.getTabop()){
+                      for( Codop codop : tabop.getTabop() ) {
                           //si el codop cargado en memoria desde el tabop.txt es = codop de Linea
-                         if( codop.getCodop().equals( linea.getCodop() )  ){
+                         if( codop.getCodop().equals( linea.getCodop() )  ) {
 
                              if ( !codop.usaOper() &&
                                      ( linea.getOper().equals("") || linea.getOper().equals("NULL") ) ){
@@ -86,20 +87,29 @@ public class ManejadorArchivos {
                                  existeCodop = true;
                                  linea.setLineaOriginal( linea.getLineaOriginal() + "    " +  codop.getModoDirec() );
 
+                             }else if( codop.usaOper() && ( linea.getOper().equals( "" ) || linea.getOper().equals( "NULL" ) )  ) {
+                                 linea.set_error( " El codop utiliza operando y no tiene" );
+                                 escribir = false;
+                                 salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
+                                 existeCodop = true;
                              }else {
                                  linea.set_error(" El codop " + linea.getCodop() + " no utiliza operando" );
+                                 salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
+                                 existeCodop = true;
+                                 escribir = false;
                                  break;
                              }
                          }
                       }
-                      /*Si se terminar el ciclo que recorre el arrayList (tabop) y no encontró el codop:
+                      /*Si se termina el ciclo que recorre el arrayList (tabop) y no encontró el codop:
                       * escribir en el archivo de errores.
                       * */
                       if( !existeCodop ){
+
                           linea.set_error(" El código de operación no existe");
-                          salidaErrores.write(linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
+                          salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
                       }
-                      else{
+                      else if( existeCodop && escribir ) {
                           salidaInstrucciones.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "\n" );
                       }
                         /*Si ya se ha leído la etq END terminar el ciclo, además de que el operando debe ser nulo*/

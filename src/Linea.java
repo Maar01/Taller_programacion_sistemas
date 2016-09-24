@@ -58,18 +58,18 @@ public class Linea {
 
         if( tokens.length == 3 ) {
             this.etq   = tokens[Validador.POSICION_ETIQUETA];
-            this.codop = tokens[Validador.POSICION_CODOP];
+            this.codop = tokens[Validador.POSICION_CODOP].toUpperCase();
             this.oper  = tokens[Validador.POSICION_OPERANDO];
         }
         else if ( tokens.length == 4 ) {
             this.etq   = tokens[Validador.POSICION_ETIQUETA];
-            this.codop = tokens[Validador.POSICION_CODOP];
+            this.codop = tokens[Validador.POSICION_CODOP].toUpperCase();
             this.oper  = tokens[Validador.POSICION_OPERANDO];
             this.comentarioStr = tokens[Validador.POSICION_COMENTARIO];
         }
         else if( tokens.length > 4 ) {
             this.etq   = tokens[Validador.POSICION_ETIQUETA];
-            this.codop = tokens[Validador.POSICION_CODOP];
+            this.codop = tokens[Validador.POSICION_CODOP].toUpperCase();
             this.oper  = tokens[Validador.POSICION_OPERANDO];
             this.comentarioStr = tokens[Validador.POSICION_COMENTARIO];
             for(byte index = Validador.POSICION_COMENTARIO; index < tokens.length; index++ ) {
@@ -81,7 +81,7 @@ public class Linea {
         }
         else {
             this.etq   = tokens[Validador.POSICION_ETIQUETA];
-            this.codop = tokens[Validador.POSICION_CODOP];
+            this.codop = tokens[Validador.POSICION_CODOP].toUpperCase();
         }
 
     }
@@ -107,7 +107,7 @@ public class Linea {
      * @return
      */
     public String getCodop() {
-        return codop;
+        return codop.toUpperCase();
     }
 
     /**

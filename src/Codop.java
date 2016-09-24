@@ -18,7 +18,7 @@ public class Codop {
 
     Codop(String lineaTabop){
         String campos[] = lineaTabop.split("\\|");
-        codop = campos[0];
+        codop = campos[0].toUpperCase();
 
         if( campos[1].equals( "SI" ) ){
             usaOper = true;
@@ -46,7 +46,7 @@ public class Codop {
     }
 
     public String getCodop() {
-        return codop;
+        return codop.toUpperCase();
     }
 
     public void setCodop(String codop) {
