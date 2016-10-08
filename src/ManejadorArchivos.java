@@ -1,3 +1,5 @@
+import Tokens.Codop;
+
 import java.io.*;
 import java.util.Scanner;
 
@@ -85,6 +87,8 @@ public class ManejadorArchivos {
                              }else if ( codop.usaOper() && //no es nulo o está vacío el operando
                                      ( !linea.getOper().equals("") && !linea.getOper().equals("NULL") ) ) {
                                  existeCodop = true;
+                                 //Si el codop utiliza operando y tiene, entonces se pasa a la verificacion
+                                 linea.verificaOperando();
                                  linea.setLineaOriginal( linea.getLineaOriginal() + "    " +  codop.getModoDirec() );
 
                              }else if( codop.usaOper() && ( linea.getOper().equals( "" ) || linea.getOper().equals( "NULL" ) )  ) {

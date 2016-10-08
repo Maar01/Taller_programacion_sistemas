@@ -1,4 +1,4 @@
-/**
+package Tokens; /**
  * Created by mario on 5/09/16.
  */
 
@@ -6,9 +6,12 @@
  * Clase encargada de guardar los datos de todo codop
  * encontrado  en el archivo .asm
  */
+
+import ModosDireccionamiento.ModoDireccionamiento;
+
 public class Codop {
 
-    private  String modoDirec;
+    private  ModoDireccionamiento modoDirec;
     private  String codMaquina;
     private  String bytesCalculados;
     private  String bytesCalcular;
@@ -16,7 +19,7 @@ public class Codop {
     private  String codop;
     private boolean usaOper;
 
-    Codop(String lineaTabop){
+    public Codop(String lineaTabop){
         String campos[] = lineaTabop.split("\\|");
         codop = campos[0].toUpperCase();
 
@@ -25,7 +28,7 @@ public class Codop {
         }else{
             usaOper = false;
         }
-        modoDirec = campos[2];
+        modoDirec = new ModoDireccionamiento( campos[2] )  ;
         codMaquina = campos[3];
         bytesCalculados = campos[4];
         bytesCalcular = campos[5];
@@ -55,11 +58,11 @@ public class Codop {
 
 
     public String getModoDirec() {
-        return modoDirec;
+        return modoDirec.getModoDireccionamientoTabop();
     }
 
     public void setModoDirec(String modoDirec) {
-        this.modoDirec = modoDirec;
+        this.modoDirec.setModoDireccionamientoTabop( modoDirec );  ;
     }
 
     public String getCodMaquina() {

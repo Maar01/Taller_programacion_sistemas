@@ -2,6 +2,8 @@
  * Created by mario on 28/08/16.
  */
 
+import Tokens.Validador;
+
 /**
  * Clase encargada de analizar y almacenar la información resultante
  * del análisis de cada linea leída desde un .asm
@@ -294,7 +296,7 @@ public class Linea {
 
     /**
      * Inicializa o cambia el tipo de línea, que corresponde a los formatos esperados
-     * y definidos en la @clase Validador
+     * y definidos en la @clase Tokens.Validador
      * @param tipoLinea
      */
     public void set_tipoLinea(byte tipoLinea ) {
@@ -305,7 +307,6 @@ public class Linea {
      * inicializa o cambia el valor que afirma o niega si la línea actual es comentario
      * @param comentario
      */
-
     public void setComentario(boolean comentario) {
         this.comentario = comentario;
     }
@@ -339,5 +340,12 @@ public class Linea {
 
     public boolean getEnd(){
         return this.end;
+    }
+
+    public boolean verificaOperando() {
+        /*
+        *
+        * Aquí empezar a implementar la verificacion de operando */
+        return true;
     }
 }
