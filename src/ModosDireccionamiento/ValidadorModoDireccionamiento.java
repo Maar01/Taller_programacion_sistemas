@@ -1,5 +1,7 @@
 package ModosDireccionamiento;
 
+import com.sun.org.apache.regexp.internal.RE;
+
 import java.util.StringTokenizer;
 
 /**
@@ -27,7 +29,10 @@ public final class ValidadorModoDireccionamiento {
     private final static byte RANGO_MAXIMO_IDX_ACUMULADOR = 15;
 
     private final static short RANGO_MINIMO_IDX2_INDIRECTO = 0;
-    private final static int RANGO_MAXIMO_IDX2_INDIRECTO = 65535;
+    private final static   int RANGO_MAXIMO_IDX2_INDIRECTO = 65535;
+
+    private final static boolean    NI_MERGAS = false;
+    private final static boolean SIMON_QUE_SI = true;
 
 
     private final static char[] simbolos_hex =
@@ -37,107 +42,189 @@ public final class ValidadorModoDireccionamiento {
 
     private final static String REGISTROS_IDX[] = {"X", "Y", "SP", "PC"};
 
-/** para convertir a diferentes bases númericas
- * temp1 = Integer.parseInt(display.getText().trim(), 16 );
- */
 
-    public static String prueba(){
-        return "test";
-    }
+    public final static String REGISTROS_INCREMENTO_DECREMENTO[] =
+            { "X+", "Y+", "SP+",
+                    "X-", "Y-", "SP-",
+                    "+X", "+Y", "+SP",
+                    "-X", "-Y", "-SP" };
 
 
-    public static boolean esInherente(String operando) {
+
+    public static ReporteModoDireccionamiento esInherente(String operando, ReporteModoDireccionamiento reporte) {
+        //aceptacion
         if( operando.equals( "" ) || operando.equals("NULL") ) {
-            return true;
+            reporte.setError(false);
+            reporte.setMensaje_error("");
+            return reporte;
         }
+        reporte.setError(true);
+        reporte.setMensaje_error("Error, este código de operación no lleva operando");
 
-        return false;
-
+        return reporte;
     }
 
-    public static boolean esInmediato8(String operando) {
+    public static ReporteModoDireccionamiento esInmediato8(String operando, ReporteModoDireccionamiento reporte) {
         int numero;
 
-
         if ( operando.startsWith("#")  ) {
-            if ( esDigito( operando.charAt( 0 ) ) ) {
+            if ( esDigito( operando.charAt( 1 ) ) ) {
                 numero = Integer.parseInt( operando.substring(1) );
                 if( numero <= RANGO_MAXIMO_IMM8_REL8_IDX1 && numero >= RANGO_MINIMO_IMM8_REL8_IDX1 ) {
-                    return true;
+                    //return true;
+                    reporte.setError(false);
+                    reporte.setMensaje_error("");
+                    return reporte;
+                } else {
+                    reporte.setError(true);
+                    reporte.setMensaje_error("Operando fuera de rango");
+                    return reporte;
                 }
-            }else {
-                 numero = cambiaBaseNumericaDecimal( operando.charAt( 0 ), operando.substring(2) );
-                 if( numero <= RANGO_MAXIMO_IMM8_REL8_IDX1 && numero >= RANGO_MINIMO_IMM8_REL8_IDX1 ) {
-                     return true;
-                 }
+            } else {
+                if( verificarBaseNumerica( operando.charAt( 1 ) ) ){
+                    numero = cambiaBaseNumericaDecimal( operando.charAt( 1 ), operando.substring(2) );
+                    if( numero <= RANGO_MAXIMO_IMM8_REL8_IDX1 && numero >= RANGO_MINIMO_IMM8_REL8_IDX1 ) {
+                        //return true;
+                        reporte.setError(false);
+                        reporte.setMensaje_error("");
+                        return reporte;
+                    } else {
+
+                        reporte.setError(true);
+                        reporte.setMensaje_error("Operando fuera de rango");
+                        return reporte;
+                    }
+                } else {
+                    reporte.setError(true);
+                    reporte.setMensaje_error("Base numerica no reconocida");
+                }
+
             }
         }
+        reporte.setMensaje_error("El operando debe iniciar con #");
+        reporte.setError(true);
 
-        return false;
+        return reporte;
     }
 
 
-
-    public static ReporteModoDireccionamiento esInmediato16(String operando ) {
+    public static ReporteModoDireccionamiento esInmediato16(String operando, ReporteModoDireccionamiento reporte ) {
         int numero;
 
         if ( operando.startsWith("#")  ) {
             if ( esDigito( operando.charAt( 1 ) ) ) {
                 numero = Integer.parseInt( operando.substring(1) );
                 if( numero <= RANGO_MAXIMO_EXT_REL16_IMM16 && numero >= RANGO_MINIMO_EXT_REL16_IMM16 ) {
-                    return true;
+                    //return true;
+                    return reporte;
+                } else {
+                    reporte.setError(true);
+                    reporte.setMensaje_error("Operando fuera de rango");
+                    return reporte;
                 }
             }else {
-                numero = cambiaBaseNumericaDecimal( operando.charAt( 1 ), operando.substring(1) );
-                if( numero <= RANGO_MAXIMO_EXT_REL16_IMM16 && numero >= RANGO_MINIMO_EXT_REL16_IMM16 ) {
-                    return true;
+                if( verificarBaseNumerica( operando.charAt( 1 ) ) ) {
+                    numero = cambiaBaseNumericaDecimal(operando.charAt(1), operando.substring(1));
+                    if (numero <= RANGO_MAXIMO_EXT_REL16_IMM16 && numero >= RANGO_MINIMO_EXT_REL16_IMM16) {
+                        //return true;
+                        return reporte;
+                    }
+                    else {
+                        reporte.setError(true);
+                        reporte.setMensaje_error("Operando fuera de rango");
+                        return reporte;
+                    }
+                } else {
+                    reporte.setError(true);
+                    reporte.setMensaje_error("Base numerica no reconocida");
                 }
             }
         }
+        reporte.setMensaje_error("El operando debe iniciar con #");
+        reporte.setError(true);
 
-        return false;
+        //return false;
+        return reporte;
     }
 
-    public static ReporteModoDireccionamiento esDirecto(String operando) {
+    public static ReporteModoDireccionamiento esDirecto(String operando, ReporteModoDireccionamiento reporte) {
         ReporteModoDireccionamiento respuesta = new ReporteModoDireccionamiento();
         int numero;
 
         if ( esDigito( operando.charAt( 0 ) ) ) {
+
             numero = Integer.parseInt( operando.substring(1) );
             if( numero <= RANGO_MAXIMO_DIR && numero >= RANGO_MINIMO_DIR ) {
-                return true;
+
+                reporte.setError(false);
+                return reporte;
+            } else {
+
+                reporte.setError(true);
+                reporte.setMensaje_error("Operando fuera de rango");
+                return reporte;
             }
-        }else {
+
+        }else if ( verificarBaseNumerica( operando.charAt( 0 ) ) ){
+
             numero = cambiaBaseNumericaDecimal( operando.charAt( 1 ), operando.substring(1) );
             if( numero <= RANGO_MAXIMO_DIR && numero >= RANGO_MINIMO_DIR ) {
-                return true;
+                //return true;
+                reporte.setError(false);
+                reporte.setMensaje_error("");
+                return reporte;
+            } else {
+                reporte.setError(true);
+                reporte.setMensaje_error("Operando fuera de rango");
+                return reporte;
             }
         }
+        reporte.setError(true);
+        reporte.setMensaje_error("Base numerica no reconocida");
 
-        return false;
+        //return false;
+        return reporte;
     }
 
-    public static ReporteModoDireccionamiento esExtendido(String operando) {
+    public static ReporteModoDireccionamiento esExtendido(String operando, ReporteModoDireccionamiento reporte) {
         int numero;
 
 
         if ( esDigito( operando.charAt( 0 ) ) ) {
             numero = Integer.parseInt( operando.substring(1) );
             if( numero <= RANGO_MAXIMO_EXT_REL16_IMM16 && numero >= RANGO_MINIMO_EXT_REL16_IMM16 ) {
-                return true;
+                //return true;
+                reporte.setError(false);
+                reporte.setMensaje_error("");
+                return reporte;
             }
-        }else {
+            else {
+                reporte.setError(true);
+                reporte.setMensaje_error("Operando fuera de rango");
+                return reporte;
+            }
+        }else if ( verificarBaseNumerica( operando.charAt( 0 ) ) ) {
             //posible error en cada método de es*();
             numero = cambiaBaseNumericaDecimal( operando.charAt( 0 ), operando.substring(1) );//el substring comienza del 0 o 1?
             if( numero <= RANGO_MAXIMO_EXT_REL16_IMM16 && numero >= RANGO_MINIMO_EXT_REL16_IMM16 ) {
-                return true;
+                //return true;
+                reporte.setError(false);
+                reporte.setMensaje_error("");
+                return reporte;
+            } else {
+                reporte.setError(true);
+                reporte.setMensaje_error("Operando fuera de rango");
+                return reporte;
             }
         }
-        return false;
+        reporte.setError(true);
+        reporte.setMensaje_error( "Base númerica no reconocida" );
+        //return false;
+        return reporte;
 
     }
 
-    public static ReporteModoDireccionamiento esIDX(String operando) {
+    public static ReporteModoDireccionamiento esIDX(String operando, ReporteModoDireccionamiento reporte) {
         char base_numerica = operando.charAt( 0 );
         int numero;
         String[] tokensIDX = operando.split( "," );
@@ -151,31 +238,53 @@ public final class ValidadorModoDireccionamiento {
         }
 
         if ( tokensIDX[0].equals( "" ) && registroCorrecto ) {
-            return true;
+            //return true;
+            reporte.setError(false);
+            reporte.setMensaje_error("");
+            return  reporte;
 
-        }else {
+        } else if  ( registroCorrecto ){
             if ( esDigito( tokensIDX[0].charAt(0) ) ) {
                 numero = Integer.parseInt( tokensIDX[0] );
                 if( numero <= RANGO_MAXIMO_IDX && numero >= RANGO_MINIMO_IDX ) {
-                    return true;
+                    //return true;
+                    reporte.setError(false);
+                    reporte.setMensaje_error("");
+                    return reporte;
+                } else {
+                    reporte.setError(true);
+                    reporte.setMensaje_error("Operando fuera de rango");
+                    return reporte;
                 }
-            }else if( operando.charAt( 0 ) == '-' ) {
+            } else if( operando.charAt( 0 ) == '-' ) {
                 //aquí tendría que aplicar algo de complemento a 2
 
-            }else {
+            } else if ( verificarBaseNumerica( operando.charAt(0) ) ) {
                 numero = cambiaBaseNumericaDecimal( operando.charAt( 0 ), operando.substring(1) );
                 if( numero <= RANGO_MAXIMO_IDX && numero >= RANGO_MINIMO_IDX ) {
-                    return true;
+                   // return true;
+                    reporte.setError(false);
+                    reporte.setMensaje_error("");
+                    return reporte;
+                } else {
+                    reporte.setError(true);
+                    reporte.setMensaje_error("Operando fuera de rango");
+                    return reporte;
                 }
             }
-            return false;
+            //return false;
+            reporte.setError(true);
+            reporte.setMensaje_error(" base númerica no reconocida ");
+            return reporte;
 
         }
 
-        //return false;
+        reporte.setError(true);
+        reporte.setMensaje_error(" Registro no reconocido ");
+        return reporte;
     }
 
-    public static ReporteModoDireccionamiento esIDX1(String operando) {
+    public static ReporteModoDireccionamiento esIDX1(String operando, ReporteModoDireccionamiento reporte) {
 
         char base_numerica = operando.charAt( 1 );
         int numero;
@@ -190,29 +299,45 @@ public final class ValidadorModoDireccionamiento {
         }
 
         if ( tokensIDX[0].equals( "" ) && registroCorrecto ) {
-            return true;
+            //return true;
+            reporte.setError(false);
+            reporte.setMensaje_error("");
+            return reporte;
 
-        }else {
+        }else if  ( registroCorrecto ) {
             if ( esDigito( tokensIDX[0].charAt(0) ) ) {
                 numero = Integer.parseInt( tokensIDX[0] );
                 if( numero <= RANGO_MAXIMO_IMM8_REL8_IDX1 && numero >= RANGO_MINIMO_IMM8_REL8_IDX1 ) {
-                    return true;
+                    //return true;
+                    return reporte;
                 }
             }else if( operando.charAt( 0 ) == '-' ) {
                 //aquí tendría que aplicar algo de complemento a 2
 
-            }else {
+            }else if (verificarBaseNumerica( operando.charAt( 0 ) ) ) {
                 numero = cambiaBaseNumericaDecimal( operando.charAt( 0 ), operando.substring(1) );
                 if( numero <= RANGO_MAXIMO_IMM8_REL8_IDX1 && numero >= RANGO_MINIMO_IMM8_REL8_IDX1 ) {
-                    return true;
+                    //return true;
+                    reporte.setError(false);
+                    reporte.setMensaje_error("");
+                    return reporte;
+                } else {
+                    reporte.setError(true);
+                    reporte.setMensaje_error( " operando fuera de rango " );
                 }
             }
-            return false;
+            //return false;
+            reporte.setMensaje_error( " base númerica no reconocida" );
+            reporte.setError(true);
+            return reporte;
 
         }
+        reporte.setError(true);
+        reporte.setMensaje_error(" Registro no reconocido ");
+        return reporte;
     }
 
-    public static ReporteModoDireccionamiento esIDX2(String operando) {
+    public static ReporteModoDireccionamiento esIDX2(String operando, ReporteModoDireccionamiento reporte) {
 
         char base_numerica = operando.charAt( 1 );
         int numero;
@@ -227,26 +352,31 @@ public final class ValidadorModoDireccionamiento {
         }
 
         if ( tokensIDX[0].equals( "" ) && registroCorrecto ) {
-            return true;
+            //return true;
+            return reporte;
 
         }else {
             if ( esDigito( tokensIDX[0].charAt(0) ) ) {
                 numero = Integer.parseInt( tokensIDX[0] );
                 if( numero <= RANGO_MAXIMO_IDX2_INDIRECTO && numero >= RANGO_MINIMO_IDX2_INDIRECTO && registroCorrecto ) {
-                    return true;
+                    //return true;
+                    return reporte;
                 }
             } else {
                 numero = cambiaBaseNumericaDecimal( operando.charAt( 0 ), operando.substring(1) );
                 if( numero <= RANGO_MAXIMO_IDX2_INDIRECTO && numero >= RANGO_MINIMO_IDX2_INDIRECTO && registroCorrecto ) {
-                    return true;
+                    //return true;
+                    return reporte;
                 }
             }
-            return false;
+
+            //return false;
+            return reporte;
 
         }
     }
 
-    public static ReporteModoDireccionamiento esIDX2Indirecto(String operando) {
+    public static ReporteModoDireccionamiento esIDX2Indirecto(String operando, ReporteModoDireccionamiento reporte) {
 
         char base_numerica = operando.charAt( 1 );
         int numero;
@@ -264,30 +394,46 @@ public final class ValidadorModoDireccionamiento {
             if ( esDigito( tokensIDX[0].charAt(1) ) ) {
                 numero = Integer.parseInt( tokensIDX[0].substring(0) );// o el substring con 1?
                 if( numero <= RANGO_MAXIMO_IDX2_INDIRECTO && numero >= RANGO_MINIMO_IDX2_INDIRECTO && registroCorrecto) {
-                    return true;
+                    //return true;
+                    reporte.setError(NI_MERGAS);
+                    reporte.setMensaje_error( "" );
+                    return reporte;
+                } else {
+                    reporte.setError(SIMON_QUE_SI);
+                    reporte.setMensaje_error( " operando fuera de rango" );
+                    return reporte;
                 }
-            } else {
+            } else if ( verificarBaseNumerica( operando.charAt( 0 ) ) ) {
                 numero = cambiaBaseNumericaDecimal( operando.charAt( 1 ), operando.substring(1) );
                 if( numero <= RANGO_MAXIMO_IDX2_INDIRECTO && numero >= RANGO_MINIMO_IDX2_INDIRECTO && registroCorrecto) {
-                    return true;
+                    //return true;
+                    reporte.setError(NI_MERGAS);
+                    reporte.setMensaje_error( "" );
+                    return reporte;
+                }
+                else {
+                    reporte.setError( SIMON_QUE_SI );
+                    reporte.setMensaje_error( " operando fuera de rango" );
+                    return reporte;
                 }
             }
-            return false;
+            reporte.setError( SIMON_QUE_SI );
+            reporte.setMensaje_error( " Operando fuera de rango" );
+            //return false;
+            return reporte;
 
         } else {
-            return false;
+            reporte.setMensaje_error( " El operando debe iniciar y terminar con corchetes repectivamente" );
+            reporte.setError( SIMON_QUE_SI );
+            //return false;
+            return reporte;
         }
 
 
     }
 
-    public final static String REGISTROS_INCREMENTO_DECREMENTO[] =
-            { "X+", "Y+", "SP+",
-              "X-", "Y-", "SP-",
-              "+X", "+Y", "+SP",
-              "-X", "-Y", "-SP" };
 
-    public static ReporteModoDireccionamiento esIDXPrePost( String operando ) {
+    public static ReporteModoDireccionamiento esIDXPrePost( String operando, ReporteModoDireccionamiento reporte ) {
         char base_numerica = operando.charAt( 1 );
         int numero;
         String[] tokensIDX = operando.split( "," );
@@ -299,99 +445,173 @@ public final class ValidadorModoDireccionamiento {
                 break;
             }
         }
-
+        if ( registroCorrecto ) {
             if ( esDigito( tokensIDX[0].charAt(0) ) ) {
                 numero = Integer.parseInt( tokensIDX[0] );
                 if( numero <= RANGO_MAXIMO_IDX_PRE_POST && numero >= RANGO_MINIMO_IDX_PRE_POST && registroCorrecto ) {
-                    return true;
+                    //return true;
+                    reporte.setError(NI_MERGAS);
+                    reporte.setMensaje_error("");
+                    return reporte;
                 }
-            } else {
+            } else if ( verificarBaseNumerica( tokensIDX[0].charAt(0) ) ) {
                 numero = cambiaBaseNumericaDecimal( operando.charAt( 0 ), operando.substring(1) );
                 if( numero <= RANGO_MAXIMO_IDX && numero >= RANGO_MINIMO_IDX && registroCorrecto) {
-                    return true;
+                    //return true;
+                    reporte.setError(NI_MERGAS);
+                    reporte.setMensaje_error("");
+                    return reporte;
+                } else {
+                    reporte.setError( SIMON_QUE_SI );
+                    reporte.setMensaje_error( " Operando fuera de rango" );
+                    //return false;
+                    return reporte;
                 }
             }
-            return false;
+        }
+         reporte.setError(SIMON_QUE_SI);
+         reporte.setMensaje_error(" El registro no se reconoce");
+
+            //return false;
+
+        return reporte;
     }
 
-    public static ReporteModoDireccionamiento esIDXAcumulador( String operando ) {
+    public static ReporteModoDireccionamiento esIDXAcumulador( String operando, ReporteModoDireccionamiento reporte ) {
         String[] operando_dividido = operando.split( "," );
 
 
         if( operando_dividido[0] == "A" || operando_dividido[0] == "B" || operando_dividido[0] == "D" ) {
             for( short index = 0; index < REGISTROS_IDX.length; index++ ) {
                 if( operando_dividido[1] == REGISTROS_IDX[index] ) {
-                    return true;
+                    //return true;
+                    reporte.setError( NI_MERGAS );
+                    reporte.setMensaje_error( "" );
+                    return reporte;
                 }
+
             }
+            reporte.setError( true );
+            reporte.setMensaje_error( " El registro no se reconoce " );
+            return reporte;
         }
-        return false;
+        reporte.setError(SIMON_QUE_SI);
+        reporte.setMensaje_error( "  Acumulador es diferente a A,B y D" );
+        //return false;
+        return reporte;
 
     }
 
-    public static ReporteModoDireccionamiento esIDXAcumuladorIndirecto(String operando) {
+    public static ReporteModoDireccionamiento esIDXAcumuladorIndirecto(String operando, ReporteModoDireccionamiento reporte) {
         String[] operando_dividido = operando.split( "," );
         if( operando_dividido[0] == "D" ) {
             for( short index = 0; index < REGISTROS_IDX.length; index++ ) {
                 if( operando_dividido[1] == REGISTROS_IDX[index] ) {
-                    return true;
+                    //return true;
+                    return reporte;
                 }
             }
+            reporte.setError( true );
+            reporte.setMensaje_error( " El registro no se reconoce " );
+            return reporte;
         }
-        return false;
+        reporte.setError( true );
+        reporte.setMensaje_error( " El acumulador no es D " );
+
+        //return false;
+        return reporte;
 
     }
     // se tendría que verificar el codop antes de esta función, ya que los codops de 16 bits comienzan con l
-    public static ReporteModoDireccionamiento esRelativo8(String operando) {
+    public static ReporteModoDireccionamiento esRelativo8(String operando, ReporteModoDireccionamiento reporte) {
         int numero;
         if( esDigito( operando.charAt( 0 )  ) ) {
             numero = Integer.parseInt( operando );
             if( numero <= RANGO_MAXIMO_IMM8_REL8_IDX1 && numero >= RANGO_MINIMO_IMM8_REL8_IDX1 ) {
-                return true;
+                //return true;
+                reporte.setError( false );
+                reporte.setMensaje_error( "" );
+
+                return reporte;
             }else {
-                numero = cambiaBaseNumericaDecimal( operando.charAt(0) , operando.substring(1) );
-                if ( numero <= RANGO_MAXIMO_IMM8_REL8_IDX1 && numero >= RANGO_MINIMO_IMM8_REL8_IDX1 ) {
-                    return true;
-                }
+                reporte.setError( true );
+                reporte.setMensaje_error( "  Operando fuera de rango" );
+
+                return reporte;
             }
+        } else if ( verificarBaseNumerica( operando.charAt( 0 ) ) )  {
+
+            numero = cambiaBaseNumericaDecimal( operando.charAt(0) , operando.substring(1) );
+            if ( numero <= RANGO_MAXIMO_IMM8_REL8_IDX1 && numero >= RANGO_MINIMO_IMM8_REL8_IDX1 ) {
+                //return true;
+                reporte.setError( false );
+                reporte.setMensaje_error( "" );
+
+                return reporte;
+            } else {
+                reporte.setError( true );
+                reporte.setMensaje_error( "  Operando fuera de rango" );
+
+                return reporte;
+            }
+
+        } else {
+            reporte.setError(true);
+            reporte.setMensaje_error( " No se reconoce la base numerica" );
+            return reporte;
         }
-        return false;
+        //return false;
+
     }
 
-    public static ReporteModoDireccionamiento esRelativo16(String operando) {
+    public static ReporteModoDireccionamiento esRelativo16(String operando, ReporteModoDireccionamiento reporte) {
 
         int numero;
         if( esDigito( operando.charAt( 0 )  ) ) {
             numero = Integer.parseInt( operando );
             if( numero <= RANGO_MAXIMO_EXT_REL16_IMM16 && numero >= RANGO_MINIMO_EXT_REL16_IMM16 ) {
-                return true;
-            }else {
-                numero = cambiaBaseNumericaDecimal( operando.charAt(0) , operando.substring(1) );
-                if ( numero <= RANGO_MAXIMO_EXT_REL16_IMM16 && numero >= RANGO_MINIMO_EXT_REL16_IMM16 ) {
-                    return true;
-                }
+                //return true;
+                reporte.setError(false);
+                reporte.setMensaje_error("");
+                return reporte;
+            } else {
+                reporte.setError( true );
+                reporte.setMensaje_error( "operando fuera de rango" );
+            }
+        } else if ( verificarBaseNumerica( operando.charAt( 0 ) ) ) {
+            numero = cambiaBaseNumericaDecimal( operando.charAt(0) , operando.substring(1) );
+            if ( numero <= RANGO_MAXIMO_EXT_REL16_IMM16 && numero >= RANGO_MINIMO_EXT_REL16_IMM16 ) {
+                //return true;
+                return reporte;
+            } else {
+                reporte.setError( true );
+                reporte.setMensaje_error( "operando fuera de rango" );
             }
         }
-        return false;
+        reporte.setMensaje_error(" No se reconoce la base numérica");
+        //return false;
+        return reporte;
     }
 
-    public static void verificarBaseNumerica( char base_numerica, String numero ) {
+    public static boolean verificarBaseNumerica( char base_numerica ) {
 
         switch ( base_numerica ) {
             //octal
             case '@':
+                return true;
 
-                break;
             //Hexadecimal
             case '$':
+                return true;
 
-                break;
             //binario
             case '%':
+                return true;
 
-                break;
-
+            default:
+                return false;
         }
+
     }
 
     public static Integer cambiaBaseNumericaDecimal( char base_numerica, String numero ) {

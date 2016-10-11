@@ -2,6 +2,7 @@
  * Created by mario on 28/08/16.
  */
 
+import ModosDireccionamiento.ReporteModoDireccionamiento;
 import ModosDireccionamiento.ValidadorModoDireccionamiento;
 import Tokens.Operando;
 import Tokens.Validador;
@@ -357,10 +358,12 @@ public class Linea {
         modos_direccionamiento_aceptados = lineaOriginal.split( "\\s+" );
         String retorno = "";
         operando = operando.trim();
+        ReporteModoDireccionamiento reporte = new ReporteModoDireccionamiento();
+
         for( int index = 4; index < modos_direccionamiento_aceptados.length; index++ ) {
             switch ( modos_direccionamiento_aceptados[index] ){
                 case "INH":
-                    if ( ValidadorModoDireccionamiento.esInherente( operando ) ) {
+                    if ( !ValidadorModoDireccionamiento.esInherente( operando, reporte ).isError() ) {
                         modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
                         char base_numerica = operando.charAt( 1 );
                         ValidadorModoDireccionamiento.verificarBaseNumerica( base_numerica ,operando );
@@ -370,7 +373,7 @@ public class Linea {
 
                     break;
                 case "IMM":
-                    if ( ValidadorModoDireccionamiento.esInmediato8( operando ) ) {//tal vez aqui unificar el de 8 y 16
+                    if ( !ValidadorModoDireccionamiento.esInmediato8( operando, reporte ).isError() ) {//tal vez aqui unificar el de 8 y 16
                         modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
                     }else {
 
@@ -378,7 +381,7 @@ public class Linea {
                     break;
 
                 case "DIR":
-                    if ( ValidadorModoDireccionamiento.esDirecto( operando ) ) {
+                    if ( !ValidadorModoDireccionamiento.esDirecto( operando, reporte ).isError() ) {
                         modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
                     }else {
 
@@ -387,7 +390,7 @@ public class Linea {
                     break;
 
                 case "EXT":
-                    if ( ValidadorModoDireccionamiento.esExtendido( operando ) ) {
+                    if ( !ValidadorModoDireccionamiento.esExtendido( operando, reporte ).isError() ) {
                         modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
                     } else {
 
@@ -395,11 +398,11 @@ public class Linea {
                     break;
 
                 case "IDX":
-                    if ( ValidadorModoDireccionamiento.esIDX( operando ) ) {
+                    if ( !ValidadorModoDireccionamiento.esIDX( operando, reporte ).isError() ) {
                         modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
-                    }else if ( ValidadorModoDireccionamiento.esIDXAcumulador( operando ) ) {
+                    }else if ( !ValidadorModoDireccionamiento.esIDXAcumulador( operando, reporte ).isError() ) {
                         modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
-                    }else if ( ValidadorModoDireccionamiento.esIDXPrePost( operando ) ) {
+                    }else if ( !ValidadorModoDireccionamiento.esIDXPrePost( operando, reporte ).isError() ) {
                         modo_direccionamiento_linea = modos_direccionamiento_aceptados[index];
                     } else {
                         //setear error
@@ -407,7 +410,7 @@ public class Linea {
                     break;
 
                 case "IDX1":
-                    if ( ValidadorModoDireccionamiento.esIDX1( operando ) ) {
+                    if ( !ValidadorModoDireccionamiento.esIDX1( operando, reporte ).isError() ) {
                         modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
                     } else {
 
@@ -415,7 +418,7 @@ public class Linea {
                     break;
 
                 case "IDX2":
-                    if ( ValidadorModoDireccionamiento.esIDX2( operando ) ) {
+                    if ( !ValidadorModoDireccionamiento.esIDX2( operando, reporte ).isError() ) {
                         modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
                     } else {
 
@@ -424,7 +427,7 @@ public class Linea {
                     break;
 
                 case "REL8":
-                    if ( ValidadorModoDireccionamiento.esRelativo8( operando ) ) {
+                    if ( !ValidadorModoDireccionamiento.esRelativo8( operando, reporte ).isError() ) {
                         modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
                     } else {
 
@@ -433,14 +436,14 @@ public class Linea {
                     break;
 
                 case "REL16":
-                    if (ValidadorModoDireccionamiento.esRelativo16( operando ) ) {
+                    if ( !ValidadorModoDireccionamiento.esRelativo16( operando, reporte ).isError() ) {
                         modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
                     } else {
 
                     }
                     break;
                 case "[D,IDX]":
-                    if ( ValidadorModoDireccionamiento.esIDXAcumuladorIndirecto( operando ) ) {
+                    if ( !ValidadorModoDireccionamiento.esIDXAcumuladorIndirecto( operando, reporte ).isError() ) {
                         modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
                     } else {
 
@@ -449,7 +452,7 @@ public class Linea {
                     break;
 
                 case "[IDX2]":
-                    if ( ValidadorModoDireccionamiento.esIDX2Indirecto( operando ) ) {
+                    if ( !ValidadorModoDireccionamiento.esIDX2Indirecto( operando, reporte ).isError() ) {
                         modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
                     } else {
 
