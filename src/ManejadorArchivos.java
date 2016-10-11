@@ -87,8 +87,6 @@ public class ManejadorArchivos {
                              }else if ( codop.usaOper() && //no es nulo o está vacío el operando
                                      ( !linea.getOper().equals("") && !linea.getOper().equals("NULL") ) ) {
                                  existeCodop = true;
-                                 //Si el codop utiliza operando y tiene, entonces se pasa a la verificacion
-                                 linea.verificaOperando();
                                  linea.setLineaOriginal( linea.getLineaOriginal() + "    " +  codop.getModoDirec() );
 
                              }else if( codop.usaOper() && ( linea.getOper().equals( "" ) || linea.getOper().equals( "NULL" ) )  ) {
@@ -114,6 +112,8 @@ public class ManejadorArchivos {
                           salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
                       }
                       else if( existeCodop && escribir ) {
+                          //aquí verificar el operando con los modos de direccionamiento
+                          //linea.verificaOperando();
                           salidaInstrucciones.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "\n" );
                       }
                         /*Si ya se ha leído la etq END terminar el ciclo, además de que el operando debe ser nulo*/
@@ -127,7 +127,7 @@ public class ManejadorArchivos {
                       else if( linea.getCodop().contains( "END" ) &&
                               ( !linea.getOper().equals( "" ) && !linea.getCodop().contains( "NULL" ) ) ){
                           linea.setEnd(true);
-                          System.out.println("Entra al break " + linea.getEnd() );
+                          System.out.println("Entra al break 2 " + linea.getEnd() );
                           break;
                       }
                 }

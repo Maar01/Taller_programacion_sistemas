@@ -2,6 +2,8 @@
  * Created by mario on 28/08/16.
  */
 
+import ModosDireccionamiento.ValidadorModoDireccionamiento;
+import Tokens.Operando;
 import Tokens.Validador;
 
 /**
@@ -21,6 +23,7 @@ public class Linea {
     private byte       tipoLinea = Validador.ETQ_CODOP_OP;
     private String         error = "";
     private String comentarioStr = "";
+    private String modo_direccionamiento_linea;
 
     private String tokens[];
 
@@ -343,9 +346,125 @@ public class Linea {
     }
 
     public boolean verificaOperando() {
-        /*
-        *
-        * Aquí empezar a implementar la verificacion de operando */
-        return true;
+       Operando operando = new Operando( this.oper );
+
+       return validaModoDireccionamiento( operando.getOperando() );
+
     }
+
+    public boolean validaModoDireccionamiento ( String operando ){
+        String[] modos_direccionamiento_aceptados;
+        modos_direccionamiento_aceptados = lineaOriginal.split( "\\s+" );
+        String retorno = "";
+        operando = operando.trim();
+        for( int index = 4; index < modos_direccionamiento_aceptados.length; index++ ) {
+            switch ( modos_direccionamiento_aceptados[index] ){
+                case "INH":
+                    if ( ValidadorModoDireccionamiento.esInherente( operando ) ) {
+                        modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
+                        char base_numerica = operando.charAt( 1 );
+                        ValidadorModoDireccionamiento.verificarBaseNumerica( base_numerica ,operando );
+                    } else {
+
+                    }
+
+                    break;
+                case "IMM":
+                    if ( ValidadorModoDireccionamiento.esInmediato8( operando ) ) {//tal vez aqui unificar el de 8 y 16
+                        modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
+                    }else {
+
+                    }
+                    break;
+
+                case "DIR":
+                    if ( ValidadorModoDireccionamiento.esDirecto( operando ) ) {
+                        modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
+                    }else {
+
+                    }
+
+                    break;
+
+                case "EXT":
+                    if ( ValidadorModoDireccionamiento.esExtendido( operando ) ) {
+                        modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
+                    } else {
+
+                    }
+                    break;
+
+                case "IDX":
+                    if ( ValidadorModoDireccionamiento.esIDX( operando ) ) {
+                        modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
+                    }else if ( ValidadorModoDireccionamiento.esIDXAcumulador( operando ) ) {
+                        modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
+                    }else if ( ValidadorModoDireccionamiento.esIDXPrePost( operando ) ) {
+                        modo_direccionamiento_linea = modos_direccionamiento_aceptados[index];
+                    } else {
+                        //setear error
+                    }
+                    break;
+
+                case "IDX1":
+                    if ( ValidadorModoDireccionamiento.esIDX1( operando ) ) {
+                        modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
+                    } else {
+
+                    }
+                    break;
+
+                case "IDX2":
+                    if ( ValidadorModoDireccionamiento.esIDX2( operando ) ) {
+                        modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
+                    } else {
+
+                    }
+
+                    break;
+
+                case "REL8":
+                    if ( ValidadorModoDireccionamiento.esRelativo8( operando ) ) {
+                        modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
+                    } else {
+
+                    }
+
+                    break;
+
+                case "REL16":
+                    if (ValidadorModoDireccionamiento.esRelativo16( operando ) ) {
+                        modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
+                    } else {
+
+                    }
+                    break;
+                case "[D,IDX]":
+                    if ( ValidadorModoDireccionamiento.esIDXAcumuladorIndirecto( operando ) ) {
+                        modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
+                    } else {
+
+                    }
+
+                    break;
+
+                case "[IDX2]":
+                    if ( ValidadorModoDireccionamiento.esIDX2Indirecto( operando ) ) {
+                        modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
+                    } else {
+
+                    }
+
+                    break;
+
+
+                default:
+                    //algún tipo de error
+
+            }
+        }
+        this.error = " Formato de operando no válido para ningún modo de direccionamiento";
+        return false;
+    }
+
 }
