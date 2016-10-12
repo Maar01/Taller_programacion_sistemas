@@ -126,6 +126,7 @@ public final class ValidadorModoDireccionamiento {
                 } else {
                     reporte.setError(true);
                     reporte.setMensaje_error("Operando fuera de rango");
+                    reporte.setError_final(true);
                     return reporte;
                 }
             }else {
@@ -140,6 +141,7 @@ public final class ValidadorModoDireccionamiento {
                     else {
                         reporte.setError(true);
                         reporte.setMensaje_error("Operando fuera de rango");
+                        reporte.setError_final(true);
                         return reporte;
                     }
                 } else {
@@ -214,7 +216,8 @@ public final class ValidadorModoDireccionamiento {
             }
             else {
                 reporte.setError(true);
-                reporte.setMensaje_error("Operando fuera de rango");
+                reporte.setMensaje_error("Operando fuera de rango para extendido");
+                reporte.setError_final(true);
                 return reporte;
             }
         }else if ( verificarBaseNumerica( operando.charAt( 0 ) ) ) {
@@ -227,7 +230,8 @@ public final class ValidadorModoDireccionamiento {
                 return reporte;
             } else {
                 reporte.setError(true);
-                reporte.setMensaje_error("Operando fuera de rango");
+                reporte.setError_final(true);
+                reporte.setMensaje_error("Operando fuera de rango para EXT ");
                 return reporte;
             }
         }
@@ -383,6 +387,11 @@ public final class ValidadorModoDireccionamiento {
                     reporte.setError(false);
                     reporte.setMensaje_error("");
                     return reporte;
+                } else {
+                    reporte.setError(true);
+                    reporte.setMensaje_error("Operando fuera de rango para IDX2");
+                    reporte.setError_final(true);
+                    return reporte;
                 }
             } else {
                 //System.out.println(operando.charAt(0) + "Aquí mero");
@@ -398,6 +407,7 @@ public final class ValidadorModoDireccionamiento {
                         reporte.setError(true);
                         reporte.setModo_direccionamiento("IDX2");
                         reporte.setMensaje_error("Operando fuera de rango para IDX2");
+                        reporte.setError_final(true);
                     }
                 }
                 reporte.setError(true);
@@ -440,7 +450,7 @@ public final class ValidadorModoDireccionamiento {
                 } else {
                     reporte.setError(SIMON_QUE_SI);
                     reporte.setMensaje_error( " operando fuera de rango para IDX2 indirecto" );
-
+                    reporte.setError_final(true);
                     return reporte;
                 }
             } else if ( verificarBaseNumerica( operando.charAt( 0 ) ) ) {
@@ -456,6 +466,7 @@ public final class ValidadorModoDireccionamiento {
                     reporte.setError( SIMON_QUE_SI );
                     reporte.setMensaje_error( " operando fuera de rango para IDX2 indirecto" );
                     reporte.setModo_direccionamiento("IDX2 indirecto");
+                    reporte.setError_final(true);
                     return reporte;
                 }
             }
@@ -494,10 +505,17 @@ public final class ValidadorModoDireccionamiento {
                 numero = Integer.parseInt( tokensIDX[0] );
                 if( numero <= RANGO_MAXIMO_IDX_PRE_POST && numero >= RANGO_MINIMO_IDX_PRE_POST && registroCorrecto ) {
                     //return true;
-                    reporte.setError(NI_MERGAS);
+                    reporte.setError(true);
                     reporte.setMensaje_error("");
                     reporte.setModo_direccionamiento("IDX pre / post");
                     return reporte;
+                }else {
+                    reporte.setError(true);
+                    reporte.setMensaje_error("operador fuera de rango para IDX pre/post");
+                    reporte.setModo_direccionamiento("IDX pre / post");
+                    reporte.setError_final(true);
+                    return reporte;
+
                 }
             } else if ( verificarBaseNumerica( tokensIDX[0].charAt(0) ) ) {
                 numero = cambiaBaseNumericaDecimal( operando.charAt( 0 ), operando.substring(1) );
@@ -511,16 +529,15 @@ public final class ValidadorModoDireccionamiento {
                     reporte.setError( SIMON_QUE_SI );
                     reporte.setMensaje_error( " Operando fuera de rango para IDX pre /post" );
                     //return false;
+                    reporte.setError_final(true);
                     reporte.setModo_direccionamiento("IDX pre / post");
                     return reporte;
                 }
             }
         }
-         reporte.setError(SIMON_QUE_SI);
+         reporte.setError(true);
          reporte.setMensaje_error(" El registro no se reconoce IDX pre / post");
         reporte.setModo_direccionamiento("IDX pre / post");
-
-            //return false;
 
         return reporte;
     }
@@ -543,6 +560,7 @@ public final class ValidadorModoDireccionamiento {
             reporte.setError( true );
             reporte.setMensaje_error( " El registro no se reconoce " );
             reporte.setModo_direccionamiento("IDX acumulador");
+            reporte.setError_final(true);
             return reporte;
         }
         reporte.setError(SIMON_QUE_SI);
@@ -566,8 +584,9 @@ public final class ValidadorModoDireccionamiento {
                 }
             }
             reporte.setError( true );
-            reporte.setMensaje_error( " El registro no se reconoce " );
+            reporte.setMensaje_error( " El registro no se reconoce para IDX de acumulador indirecto" );
             reporte.setModo_direccionamiento(" IDXAcumulador indirecto");
+            reporte.setError_final(true);
             return reporte;
         }
         reporte.setError( true );
@@ -789,6 +808,19 @@ public final class ValidadorModoDireccionamiento {
             }
         }
         return true;
+    }
+    /*
+    * Convierte números de 8 bits a complemento a 2 según su base
+    * */
+    public static byte complemento2_8( String numero, short base ){
+        return Short.valueOf( numero, base ).byteValue();
+    }
+
+    /*
+    * Convierte números de 16 bits a complemento a 2 según su base
+    * */
+    public static Short complemento2_16(String num, short base){
+        return Integer.valueOf(num, base).shortValue();
     }
 
 }

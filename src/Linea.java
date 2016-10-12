@@ -453,7 +453,7 @@ public class Linea {
                     //algún tipo de error
 
             }//switch
-            if ( !reporte.isError()  ) {
+            if ( !reporte.isError() || reporte.isError_final() ) {
                 break;//se espera romper el ciclo for
             }
         }//finaliza for

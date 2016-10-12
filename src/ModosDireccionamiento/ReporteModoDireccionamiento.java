@@ -6,8 +6,9 @@ package ModosDireccionamiento;
 public class ReporteModoDireccionamiento {
 
     private boolean error;
-    private String mensaje_error = "";
-    private String modo_direccionamiento;
+    private String  mensaje_error = "";
+    private String  modo_direccionamiento;
+    private boolean error_final = false;
 
     public ReporteModoDireccionamiento () {
 
@@ -35,6 +36,14 @@ public class ReporteModoDireccionamiento {
 
     public void setModo_direccionamiento(String modo_direccionamiento) {
         this.modo_direccionamiento = modo_direccionamiento;
+    }
+
+    public boolean isError_final() {
+        return error_final;
+    }
+
+    public void setError_final( boolean valor ){
+        error_final = valor;
     }
 
 }
