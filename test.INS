@@ -1,0 +1,46 @@
+3       NULL     LDAA    %11111111,X    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IDX1 
+4       NULL     LDAA    %111111111,Y    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IDX2 
+5       NULL     LDAA    %1111111111,SP    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IDX2 
+14       NULL     LDAA    %11111111    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  DIR 
+15       NULL     LDAA    %111111111    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  EXT 
+16       NULL     INCA    NULL   INH 
+20       NULL     JMP    0,PC    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IDX1 
+22       NULL     JMP    [0,Y]    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IDX2 indirecto 
+26       NULL     BITB    256    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  EXT 
+30       NULL     LDAA    11,X    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IDX1 
+31       NULL     LDAA    111,Y    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IDX1 
+32       NULL     LDAA    0,SP    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IDX1 
+36       NULL     CLC    NULL   IMM 
+38       NULL     SUBD    #4096    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IMM16 
+39       NULL     SUBD    #$00FF    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IMM8 
+40       ET2     SUBD    #0    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IMM8 
+41       NULL     ABA    NULL   INH 
+42       NULL     ASLD    NULL   INH 
+43       NULL     BGND    NULL   INH 
+44       ET3     SBCA    #$0    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IMM8 
+45       NULL     SBCA    #255    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IMM8 
+46       NULL     LDAA    $55    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  DIR 
+47       NULL     LDAA    $0055    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  DIR 
+48       NULL     LDX    $20    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  DIR 
+50       NULL     SUBA    4096    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  EXT 
+52       NULL     LDAA    $1FF    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  EXT 
+53       NULL     LDAA    $FFFF    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  EXT 
+54       NULL     ADDB    $FFF    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  EXT 
+55       NULL     LDAA    ET1    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  EXT 
+56       NULL     SUBA    180    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  DIR 
+57       NULL     LDAA    #$55    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IMM8 
+58       ET4     LDX    #$1234    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IMM16 
+59       NULL     LDY    #$67    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IMM8 
+60       NULL     IDIV    NULL   INH 
+61       NULL     DEX    NULL   INH 
+63       NULL     LDAA    %011111111,SP    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IDX1 
+65       NULL     LDAA    #100    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IMM8 
+66       NULL     LDX    #1234    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IMM16 
+68       NULL     LDAA    #$64    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IMM8 
+69       NULL     LDAA    #$9c    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IMM8 
+70       NULL     LDX    #$1234    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IMM16 
+72       NULL     LDAA    #%01100100    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IMM8 
+73       NULL     LDAA    #%11110000    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IMM8 
+75       NULL     LDX    #%0001001000110100    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]   Modo correspondiente:  IMM16 
+76       NULL     END    NULL   DIR 
+76       NULL     END    NULL   DIR

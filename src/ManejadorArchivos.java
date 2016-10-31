@@ -83,18 +83,21 @@ public class ManejadorArchivos {
                              if ( !codop.usaOper() &&
                                      ( linea.getOper().equals("") || linea.getOper().equals("NULL") ) ){
                                  existeCodop = true;
+                                 escribir = false;
                                  linea.setLineaOriginal( linea.getLineaOriginal() + "   " +  codop.getModoDirec() );
-                             }else if ( codop.usaOper() && //no es nulo o está vacío el operando
+                                 salidaInstrucciones.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + " \n"  );
+                             } else if ( codop.usaOper() && //no es nulo o está vacío el operando
                                      ( !linea.getOper().equals("") && !linea.getOper().equals("NULL") ) ) {
                                  existeCodop = true;
                                  linea.setLineaOriginal( linea.getLineaOriginal() + "    " +  codop.getModoDirec() );
 
-                             }else if( codop.usaOper() && ( linea.getOper().equals( "" ) || linea.getOper().equals( "NULL" ) )  ) {
+                             } else if( codop.usaOper() && ( linea.getOper().equals( "" ) || linea.getOper().equals( "NULL" ) )  ) {
                                  linea.set_error( " El codop utiliza operando y no tiene" );
                                  escribir = false;
                                  salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
                                  existeCodop = true;
-                             }else {
+                                 break;
+                             } else {
                                  linea.set_error(" El codop " + linea.getCodop() + " no utiliza operando" );
                                  salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
                                  existeCodop = true;
@@ -114,16 +117,17 @@ public class ManejadorArchivos {
                       else if( existeCodop && escribir ) {
                           /*Modificaciones en este archivo para práctica 3*/
                           //aquí verificar el operando con los modos de direccionamiento
-                           if ( linea.verificaOperando() ) {
-                               salidaInstrucciones.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "    "+ linea.getModo_direccionamiento_linea() + " \n" );
+                           if ( linea.verificaOperando() || linea.getCodop().equals("END") ) {
+                               salidaInstrucciones.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "   Modo correspondiente:  "+ linea.getModo_direccionamiento_linea() + " \n" );
                            } else {
+                               System.out.println( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n"  );
                                salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
                            }
                           //salidaInstrucciones.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "\n" );
                       }
                         /*Si ya se ha leído la etq END terminar el ciclo, además de que el operando debe ser nulo*/
                       if( linea.getCodop().contains("END") &&
-                              ( linea.getOper().equals( "" ) || linea.getCodop().contains( "NULL" ) ) ){
+                              ( linea.getOper().equals( "NULL" ) || linea.getCodop().contains( "NULL" ) ) ){
                           linea.setEnd(true);
                           salidaInstrucciones.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "\n" );
                           System.out.println("Entra al break " + linea.getEnd() );
@@ -141,7 +145,7 @@ public class ManejadorArchivos {
                 //escribir en archivo de errores
 
                 if( linea.es_comentario() ){/*omitimos acción de escritura*/ }
-                else{
+                else {
                     salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
                 }
             }

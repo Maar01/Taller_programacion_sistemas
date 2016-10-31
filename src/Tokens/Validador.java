@@ -16,7 +16,7 @@ public final class Validador {
     //REGEX
     private static final String ETIQUETA = "^([a-zA-Z]){1}[\\w]{0,7}";//
     private static final String CODOP = "([a-zA-Z]){1,5}\\.?";//
-    private static final String OPERANDO = ".{1,}";//
+    private static final String OPERANDO = ".{1,}";//".{1,}";//
     private static final String COMENTARIO = "^[;]{1}.*";//
 
     //Posiciones en arreglo que le corresponde a cada token generado por linea.split()

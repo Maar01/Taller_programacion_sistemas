@@ -2,7 +2,7 @@ package ModosDireccionamiento;
 
 /**
  * Created by mario on 6/10/16.
- * domingo 30 de oct fiesta de Yeriel. Avisar
+ *
  */
 public class ModoDireccionamiento {
     private String modoDireccionamientoTabop;

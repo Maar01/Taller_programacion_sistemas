@@ -1,4 +1,28 @@
+ addd 5
 
+ ABA
+etq4 INCA
+etq5 CLRA @15
+etq6	   	clra
+ CLR 10  
+ JmP 20
+ LDAA 255	
+ LDAA 256	;
+ LDAA #10	
+etq12 LDAa
+ LDAA $100
+ BLO 1000
+ LBLO 0
+etq16 STAA #100
+etq17 ANDA #100000
+etq18 LDAA [100,X
+etaq19 LDAA 100,Y]
+ LDAA $A;KSHAKSJHDSAJKDKDJSALDKSAJDLKSAJDLKASJDLSA
+etq21 LDAA 100,X+
+etq22 LDAA ,
+etq23 LDAA 3,-X+
+etq24 LDAA -3,-X
+ LDAA [-1000,PC]
 etq26 LDAA @100,PC+
  LDAA %11111111,X
  LDAA %111111111,Y
@@ -73,4 +97,4 @@ END
  ldaa #%11110000 ; Most significant
 ; nibble mask
  ldx #%0001001000110100 ; X = $1234
-    END
+	END
