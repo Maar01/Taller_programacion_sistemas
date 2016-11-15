@@ -322,6 +322,9 @@ public final class ValidadorModoDireccionamiento {
     public static ReporteModoDireccionamiento esIDX(String operando, ReporteModoDireccionamiento reporte) {
 
         int numero;
+        if ( operando.startsWith(",") ) {
+            operando = "0" + operando;
+        }
         String[] tokensIDX = operando.split( "," );
         boolean registroCorrecto = false;
         reporte.setModo_direccionamiento("IDX");
@@ -410,6 +413,9 @@ public final class ValidadorModoDireccionamiento {
 
 
         int numero;
+        if ( operando.startsWith(",") ) {
+            operando = "0" + operando;
+        }
         String[] tokensIDX = operando.split( "," );
         boolean registroCorrecto = false;
         reporte.setModo_direccionamiento("IDX1");
@@ -496,6 +502,9 @@ public final class ValidadorModoDireccionamiento {
     public static ReporteModoDireccionamiento esIDX2(String operando, ReporteModoDireccionamiento reporte) {
 
         int numero;
+        if ( operando.startsWith(",") ) {
+            operando = "0" + operando;
+        }
         String[] tokensIDX = operando.split( "," );
         boolean registroCorrecto = false;
         reporte.setModo_direccionamiento(" IDX2");
@@ -582,6 +591,9 @@ public final class ValidadorModoDireccionamiento {
     public static ReporteModoDireccionamiento esIDX2Indirecto(String operando, ReporteModoDireccionamiento reporte) {
 
         int numero;
+        if ( operando.startsWith(",") ) {
+            operando = "0" + operando;
+        }
         String[] tokensIDX = operando.split( "," );
         boolean registroCorrecto = false;
         reporte.setModo_direccionamiento("IDX2 indirecto");
@@ -655,6 +667,9 @@ public final class ValidadorModoDireccionamiento {
      */
     public static ReporteModoDireccionamiento esIDXPrePost( String operando, ReporteModoDireccionamiento reporte ) {
         int numero;
+        if ( operando.startsWith(",") ) {
+            operando = "0" + operando;
+        }
         String[] tokensIDX = operando.split( "," );
         boolean registroCorrecto = false;
 
@@ -675,7 +690,7 @@ public final class ValidadorModoDireccionamiento {
                     reporte.setMensaje_error("");
                     reporte.setModo_direccionamiento("IDX pre / post");
                     return reporte;
-                }else {
+                } else {
                     reporte.setError(true);
                     reporte.setMensaje_error("operador fuera de rango para IDX pre/post");
                     reporte.setModo_direccionamiento("IDX pre / post");
@@ -723,6 +738,9 @@ public final class ValidadorModoDireccionamiento {
      * @return
      */
     public static ReporteModoDireccionamiento esIDXAcumulador( String operando, ReporteModoDireccionamiento reporte ) {
+        if ( operando.startsWith(",") ) {
+            operando = "0" + operando;
+        }
         String[] operando_dividido = operando.split( "," );
 
         if( operando.length() > 1 ){
@@ -764,6 +782,9 @@ public final class ValidadorModoDireccionamiento {
      */
 
     public static ReporteModoDireccionamiento esIDXAcumuladorIndirecto(String operando, ReporteModoDireccionamiento reporte) {
+        if ( operando.startsWith(",") ) {
+            operando = "0" + operando;
+        }
         String[] operando_dividido = operando.split( "," );
         if ( operando.equals(",") ) {
             reporte.setError( true );
@@ -869,6 +890,7 @@ public final class ValidadorModoDireccionamiento {
                 reporte.setModo_direccionamiento("REL16");
                 return reporte;
             }
+
         } else if ( verificarBaseNumerica( operando.charAt( 0 ) ) ) {
 
             numero = cambiaBaseNumericaDecimal( operando.charAt(0) , operando.substring(1) );
@@ -884,7 +906,7 @@ public final class ValidadorModoDireccionamiento {
                 reporte.setModo_direccionamiento("REL16");
                 return reporte;
             }
-        }else if ( Validador.es_etiqueta( operando ) ) {
+        } else if ( Validador.es_etiqueta( operando ) ) {
             reporte.setModo_direccionamiento("REL16");
             reporte.setMensaje_error("");
             reporte.setError(false);
@@ -894,7 +916,6 @@ public final class ValidadorModoDireccionamiento {
             reporte.setMensaje_error(" No se reconoce la base numérica");
             reporte.setError(true);
             return reporte;
-
     }
 
     /**

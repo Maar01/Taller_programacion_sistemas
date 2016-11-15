@@ -169,7 +169,7 @@ public class Linea {
             return false;
         }else{
             this.set_tokens();
-            this.set_tipoLinea(Validador.tipo_de_linea(tokens));
+            this.set_tipoLinea( Validador.tipo_de_linea(tokens) );
 
             switch ( this.tipoLinea ) {
 
@@ -179,11 +179,11 @@ public class Linea {
                             if( Validador.es_operando(tokens[Validador.POSICION_OPERANDO]) ){
                                 return true;
                                 
-                            }else { this.error = " Formato de operando no es correcto "; }//
+                            } else { this.error = " Formato de operando no es correcto "; }//
                             
-                        }else{ this.error = " Formato de codop no es el adecuado"; }//
+                        } else{ this.error = " Formato de codop no es el adecuado"; }//
                         
-                    }else{ this.error = " El formato de la etiqueta no es correcto"; }//
+                    } else{ this.error = " El formato de la etiqueta no es correcto"; }//
 
                     break;
 
@@ -194,7 +194,7 @@ public class Linea {
                                 return true;
                             }else { this.error = " Error en el formato de CODOP"; }
                         }else{ this.error = " No puede ir solo una etiqueta "; }
-                    }else { this.error = " Formato incorrecto de etiqueta" ; }
+                    } else { this.error = " Formato incorrecto de etiqueta" ; }
 
                     break;
 
@@ -218,7 +218,7 @@ public class Linea {
                 case Validador.ETQ_CODOP_OP_COM:
                     if ( Validador.es_comentario( tokens[Validador.POSICION_COMENTARIO] ) ){
                         return true;
-                    }else if( tokens[Validador.POSICION_OPERANDO].contains(";") ){
+                    } else if( tokens[Validador.POSICION_OPERANDO].contains(";") ){
                         String tokens2[] = tokens[Validador.POSICION_OPERANDO].split(";");
                         tokens[Validador.POSICION_OPERANDO] = tokens2[0];
                         tokens[Validador.POSICION_COMENTARIO] = tokens2[1] + " " +
@@ -230,11 +230,11 @@ public class Linea {
 
                         return true;
 
-                    }else{
+                    } else {
                         for(int index = 0; index < tokens.length; index++){
                             if(tokens[index].equals("")){
 
-                            }else{
+                            } else {
                                 if(Validador.es_comentario(tokens[index])){
                                     for(int i = index; i < tokens.length; i++){
                                         tokens[index] =  tokens[i] ;
@@ -245,6 +245,9 @@ public class Linea {
                             }
                         }
                         this.error = " número de tokens invalido para la linea";
+                        if ( !Validador.es_etiqueta( tokens[Validador.POSICION_ETIQUETA] ) ) {
+                            this.error = "Formato incorrecto de etiqueta";
+                        }
                         break;
                     }
 
@@ -323,14 +326,24 @@ public class Linea {
         return error;
     }
 
+    /**
+     *
+     */
     public void setLineaEscribir(){
         lineaOriginal = "   " + etq.trim() + "     " + codop.trim() + "    " + oper.trim();
     }
 
+    /**
+     *
+     * @param error
+     */
     public void set_error( String error ){
         this.error = error;
     }
 
+    /**
+     *
+     */
     public void resetLinea(){
         this.oper  = "NULL";
         this.codop = "";
@@ -346,135 +359,152 @@ public class Linea {
         return this.end;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean verificaOperando() {
+
        Operando operando = new Operando( this.oper );
 
        return validaModoDireccionamiento( operando.getOperando() );
 
     }
 
-    public boolean validaModoDireccionamiento ( String operando ){
+    /**
+     *
+     * @param operando
+     * @return
+     */
+    public boolean validaModoDireccionamiento ( String operando ) {
+
+        if ( operando.length() > 16 ) {
+            operando = operando.substring( operando.length() - 16 );
+        }
+
         String[] modos_direccionamiento_aceptados;
         modos_direccionamiento_aceptados = lineaOriginal.split( "\\s+" );
-        String retorno = "";
         operando = operando.trim();
         ReporteModoDireccionamiento reporte = new ReporteModoDireccionamiento();
         boolean ningun_modo = false;
-        for( int index = 4; index < modos_direccionamiento_aceptados.length; index++ ) {
-            switch ( modos_direccionamiento_aceptados[index] ){
-                case "INH":
-                    reporte = ValidadorModoDireccionamiento.esInherente( operando, reporte );
 
-                    break;
-                case "IMM":
-                    reporte = ValidadorModoDireccionamiento.esInmediato8( operando, reporte );//tal vez aqui unificar el de 8 y 16
-
-                    if( reporte.isError() ) {
-
-                        reporte = ValidadorModoDireccionamiento.esInmediato16( operando, reporte );
-
-                    }
-
-                    break;
-
-                case "DIR":
-                    reporte = ValidadorModoDireccionamiento.esDirecto( operando, reporte );
-
-                    break;
-
-                case "EXT":
-                     reporte = ValidadorModoDireccionamiento.esExtendido( operando, reporte );
-                        //modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
-
-                    break;
-
-                case "IDX":
-                    reporte = ValidadorModoDireccionamiento.esIDX( operando, reporte );
-                    if ( !reporte.isError() )
-                    {
-                        reporte = ValidadorModoDireccionamiento.esIDXAcumulador( operando, reporte );
-                    }
-                    if ( !reporte.isError() ){
-                        reporte = ValidadorModoDireccionamiento.esIDXPrePost( operando, reporte );
-                    }
-                    if ( !reporte.isError() ) {
-                        reporte.setMensaje_error( reporte.getMensaje_error() );
-                        reporte.setError(true);
-                    }
-                    break;
-
-                case "IDX1":
-                    reporte = ValidadorModoDireccionamiento.esIDX1( operando, reporte );
-                        //modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
-                    break;
-
-                case "IDX2":
-                    reporte = ValidadorModoDireccionamiento.esIDX2( operando, reporte );
-                       // modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
-                    break;
-
-                case "REL":
-                    if(getCodop().charAt(0) == 'L') {
-                        reporte = ValidadorModoDireccionamiento.esRelativo16( operando, reporte );
-                    }else {
-                        reporte = ValidadorModoDireccionamiento.esRelativo8( operando, reporte );
-                    }
-
-                    //modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
-                    break;
-
-                case "REL8":
-
-                    reporte = ValidadorModoDireccionamiento.esRelativo8( operando, reporte );
-                        //modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
-                    break;
-
-                case "REL16":
-                    reporte = ValidadorModoDireccionamiento.esRelativo16( operando, reporte );
-                        //modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
-
-                    break;
-                case "[D,IDX]":
-                    reporte = ValidadorModoDireccionamiento.esIDXAcumuladorIndirecto( operando, reporte );
-                        //modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
-                    break;
-
-                case "[IDX2]":
-                    reporte = ValidadorModoDireccionamiento.esIDX2Indirecto( operando, reporte );
-                        //modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
-                    break;
-
-
-                default:
-                    //algún tipo de error
-
-            }//switch
-
-            if ( !reporte.isError() || reporte.isError_final() ) {
-                break;//se espera romper el ciclo for
-            }
-
-            if( index == (modos_direccionamiento_aceptados.length - 1) && reporte.isError() && !reporte.isError_final()) {
-                ningun_modo = true;
-            }
-        }//finaliza for
-        if ( ningun_modo ) {
-            this.error = " Operando no válido para ningún modo de direccionamiento aceptado.";
+        if ( operando.contains("+") || operando.contains( "-" ) ) {
+            reporte = ValidadorModoDireccionamiento.esIDXPrePost( operando, reporte );
         } else {
+            for( int index = 4; index < modos_direccionamiento_aceptados.length; index++ ) {
+                switch ( modos_direccionamiento_aceptados[index] ) {
+
+                    case "INH":
+                        reporte = ValidadorModoDireccionamiento.esInherente( operando, reporte );
+                        break;
+
+                    case "IMM":
+                        reporte = ValidadorModoDireccionamiento.esInmediato8( operando, reporte );//tal vez aqui unificar el de 8 y 16
+
+                        if( reporte.isError() ) {
+
+                            reporte = ValidadorModoDireccionamiento.esInmediato16( operando, reporte );
+                        }
+
+                        break;
+
+                    case "DIR":
+                        reporte = ValidadorModoDireccionamiento.esDirecto( operando, reporte );
+                        break;
+
+                    case "EXT":
+                        reporte = ValidadorModoDireccionamiento.esExtendido( operando, reporte );
+                        break;
+
+                    case "IDX":
+                        reporte = ValidadorModoDireccionamiento.esIDX( operando, reporte );
+                        if ( !reporte.isError() )
+                        {
+                            reporte = ValidadorModoDireccionamiento.esIDXAcumulador( operando, reporte );
+                        }
+                        if ( !reporte.isError() ){
+                            reporte = ValidadorModoDireccionamiento.esIDXPrePost( operando, reporte );
+                        }
+                        if ( !reporte.isError() ) {
+                            reporte.setMensaje_error( reporte.getMensaje_error() );
+                            reporte.setError(true);
+                        }
+                        break;
+
+                    case "IDX1":
+                        reporte = ValidadorModoDireccionamiento.esIDX1( operando, reporte );
+                        //modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
+                        break;
+
+                    case "IDX2":
+                        reporte = ValidadorModoDireccionamiento.esIDX2( operando, reporte );
+                        // modo_direccionamiento_linea = modos_direccionamiento_aceptados[index] ;
+                        break;
+
+                    case "REL":
+                        if(getCodop().charAt(0) == 'L') {
+                            reporte = ValidadorModoDireccionamiento.esRelativo16( operando, reporte );
+                        }else {
+                            reporte = ValidadorModoDireccionamiento.esRelativo8( operando, reporte );
+                        }
+                        break;
+
+                    case "REL8":
+                        reporte = ValidadorModoDireccionamiento.esRelativo8( operando, reporte );
+                        break;
+
+                    case "REL16":
+                        reporte = ValidadorModoDireccionamiento.esRelativo16( operando, reporte );
+                        break;
+
+                    case "[D,IDX]":
+                        reporte = ValidadorModoDireccionamiento.esIDXAcumuladorIndirecto( operando, reporte );
+                        break;
+
+                    case "[IDX2]":
+                        reporte = ValidadorModoDireccionamiento.esIDX2Indirecto( operando, reporte );
+                        break;
+
+
+                    default:
+                        //algún tipo de error
+
+                }//switch
+
+                if ( !reporte.isError() || reporte.isError_final() ) {
+                    break;//se espera romper el ciclo for
+                }
+
+                if( ( index == (modos_direccionamiento_aceptados.length - 1) ) && (reporte.isError() && !reporte.isError_final() ) ) {
+                    ningun_modo = true;
+                }
+            }
+        }
+
+        //finaliza for
+        if ( ningun_modo ) {
+
+            this.error = " Operando no válido para ningún modo de direccionamiento aceptado.";
+
+        } else {
+
             this.error = reporte.getMensaje_error();
         }
 
         this.modo_direccionamiento_linea = reporte.getModo_direccionamiento();
+
         if ( reporte.isError() ) {
             return false;
-        }else {
+        } else {
             return true;
         }
-
-
     }
+
     public String getModo_direccionamiento_linea() {
         return this.modo_direccionamiento_linea;
     }
 
+    public boolean verificaDirectivas() {
+        return false;
+    }
 }

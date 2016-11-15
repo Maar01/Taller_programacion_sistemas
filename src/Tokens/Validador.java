@@ -109,7 +109,7 @@ public final class Validador {
 
             if( tokens[POSICION_ETIQUETA].equals("") ) {
                 return _CODOP_;
-            }else {
+            } else {
                 return ETQ_CODOP;
             }
         }else if( tokens.length == 4 || tokens.length > 3 ){
