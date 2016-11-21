@@ -335,7 +335,7 @@ public final class ValidadorModoDireccionamiento {
                     registroCorrecto = true;
                     break;
                 }
-            }
+            }// por aquí se puede agregar el error de : registro no reconocido.
         }
 
         if ( tokensIDX.length > 2){
