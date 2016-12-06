@@ -1,21 +1,25 @@
-2       etq26     LDAA    @100,PC+    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2] El registro no se reconoce
-6       E     LDAA    %11111111111111111111111111111111111111111111111111,PC    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]Operando fuera de rango para IDX2
-7       E     JMP    D,D    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2] Operando no válido para ningún modo de direccionamiento aceptado.
-8    HOLA No es posible sólo tener una etiqueta en la línea
-10       NULL     HOLA    NULL El código de operación no existe
-11       E     E    E El código de operación no existe
-12       E     LDAA    E,X    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2] Operando no válido para ningún modo de direccionamiento aceptado.
-13       E     LDAA    ,X    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2] Operando incompleto para IDX 
-17       E     INC    $-136    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]Error en el formato numerico del operando 
-18       E     BITA    #@-100    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]Error en el formato númerico del operando
-19       E     LDAA    0,+y    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]Operando fuera de rango para IDX2
-21       NULL     JMP    ,PC    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2] Operando incompleto para IDX 
-23       NULL     JMP    [,Y]    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2] Operando no válido para ningún modo de direccionamiento aceptado.
-24       E     JMP    [10,Y,]    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2] Operando erroneo para IDX 
-25       E     JMP    10,y,0    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2] Operando erroneo para IDX 
-27       NULL     CPD    juan56789    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2] Operando no válido para ningún modo de direccionamiento aceptado.
-29       E     LDAA    100,PC+    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]Operando fuera de rango para IDX2
-34       NULL     LBVS    65536    REL operando fuera de rango para REL16
-49       NULL     SBCA    #@85    IMM    DIR    EXT    IDX    IDX1    IDX2    [D,IDX]    [IDX2]Error en el formato númerico del operando
-51       ET1     EQU    $38 El código de operación no existe
-62    END No es posible sólo tener una etiqueta en la línea
+1    	EQU  -> EQU debe tener una etiqueta
+2    	EQU	4  -> EQU debe tener una etiqueta
+3    EN2	EQU	80000  -> Valor fuera de rango
+6     NULL     DB    NULL      Sin operando válido.
+7    	DC.B	$M    Error en formato de número
+8     NULL     FCB    80000     Número fuera de rango para directiva de constantes 1 byte
+9     NULL     DW    NULL      Sin operando válido.
+10    RMB	80000    No es directiva ni codigo de operación
+23    	DC.W	@M    Error en formato de número
+24     DC.W	@8500    Error en formato de número
+25     NULL     FDB    80000     Número fuera de rango para directiva de constantes 2 byte
+28     NULL     FCC    NULL     Operando invalido para FCC
+29     NULL     FCC    "     Operando para FCC deben iniciar y terminar con comillas
+30     NULL     FCC    "H     Operando para FCC deben iniciar y terminar con comillas
+31     NULL     FCC    H"     Operando para FCC deben iniciar y terminar con comillas
+32     NULL     DS    NULL      Sin operando válido.
+33     NULL     FCB    $ff     Número fuera de rango para directiva de constantes 1 byte
+34    	DS.B	$M    Error en formato de número
+35     NULL     RMB    80000     Fuera de rango para RMB
+36        NULL     ORG    $0     Ya existe un org en el archivo 
+37       e4     ADCA    $3    IMM Operando no válido para ningún modo de direccionamiento aceptado.
+38  	DS.W     Sin operando válido.
+39    	DS.W	%M    Error en formato de número
+40     NULL     RMW    80000     Fuera de rango para RMW
+42       e3     LDAA    5    IMM Operando no válido para ningún modo de direccionamiento aceptado.

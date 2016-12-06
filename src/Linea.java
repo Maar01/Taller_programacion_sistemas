@@ -68,6 +68,7 @@ public class Linea {
             this.oper  = tokens[Validador.POSICION_OPERANDO].split(";")[0];
         }
         else if ( tokens.length == 4 ) {
+
             this.etq   = tokens[Validador.POSICION_ETIQUETA];
             this.codop = tokens[Validador.POSICION_CODOP].toUpperCase();
             this.oper  = tokens[Validador.POSICION_OPERANDO];
@@ -89,6 +90,8 @@ public class Linea {
             this.etq   = tokens[Validador.POSICION_ETIQUETA];
             this.codop = tokens[Validador.POSICION_CODOP].toUpperCase();
         }
+
+
 
     }
 
@@ -167,7 +170,7 @@ public class Linea {
         if( Validador.es_comentario(this.lineaOriginal) ){
             comentario = true;
             return false;
-        }else{
+        } else {
             this.set_tokens();
             this.set_tipoLinea( Validador.tipo_de_linea(tokens) );
 
@@ -231,7 +234,7 @@ public class Linea {
                         return true;
 
                     } else {
-                        for(int index = 0; index < tokens.length; index++){
+                        for(int index = 0; index < tokens.length; index++) {
                             if(tokens[index].equals("")){
 
                             } else {
@@ -341,6 +344,10 @@ public class Linea {
         this.error = error;
     }
 
+    public void setOper( String operando ) {
+        this.oper = operando;
+    }
+
     /**
      *
      */
@@ -379,7 +386,7 @@ public class Linea {
     public boolean validaModoDireccionamiento ( String operando ) {
 
         if ( operando.length() > 16 ) {
-            operando = operando.substring( operando.length() - 16 );
+            operando = operando.charAt(0)+""+ operando.substring( operando.length() - 16 );
         }
 
         String[] modos_direccionamiento_aceptados;

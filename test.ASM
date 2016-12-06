@@ -1,76 +1,44 @@
-
-etq26 LDAA @100,PC+
- LDAA %11111111,X
- LDAA %111111111,Y
- LDAA %1111111111,SP
-E LDAA %11111111111111111111111111111111111111111111111111,PC
-E JMP D,D
-HOLA
-
- HOLA
-E E E
-E LDAA E,X
-E LDAA ,X
- LDAA %11111111
- LDAA %111111111
-	inca
-E INC $-136
-E bita #@-100
-E LDAA 0,+y
- jmp 0,PC
- jmp ,PC
- JMP [0,Y]
- JMP [,Y]
-E jmp [10,Y,]
-E jmp 10,y,0
- bitb 256
- cpd juan56789
-
-E LDAA 100,PC+
- LDAA 11,X
- LDAA 111,Y
- LDAA 0,SP
-
- lbvs 65536
-
- clc
-
-	SUBD	#4096
-	SUBD	#$00FF
-ET2	SUBD	#0
-	ABA
-	ASLD
-	BGND
-ET3	SBCA	#$0
-	SBCA	#255
-	LDAA	$55
-	LDAA	$0055
-	LDX	$20
-	SBCA	#@85
-	SUBA	4096
-ET1	EQU	$38
-	LDAA	$1FF
-	LDAA	$FFFF
-	ADDB	$FFF
-	LDAA	ET1
-	SUBA	180
-	LDAA	#$55
-ET4	LDX	#$1234
-	LDY	#$67
-	IDIV
-	DEX
-END
-	LDAA %011111111,SP
-
- ldaa #100 ; A = 100
- ldx #1234 ; X = 1234
-; Hexadecimal Constants
- ldaa #$64 ; A = $64 = 100
- ldaa #$9c ; A = $9c = -100
- ldx #$1234 ; X = $1234 = 4660
-; Binary Constants
- ldaa #%01100100 ; A = $64 = 100
- ldaa #%11110000 ; Most significant
-; nibble mask
- ldx #%0001001000110100 ; X = $1234
-    END
+	EQU
+	EQU	4
+EN2	EQU	80000
+	ORG	0
+EN3	EQU	3
+	DB
+	DC.B	$M
+	FCB	80000
+	DW
+RMB	80000
+	DW   2  ;2
+	DB   2
+	DC.W 2
+	DC.B 2
+e1	FCB  2
+	FDB  2222
+	DS   34
+	DS.B 34
+	DS.W 34  ;68
+e2	RMB  34
+	RMW  34 ;68
+	FCC  "HOLA MUNDO"
+	DC.W	@M
+ DC.W	@8500
+	FDB	80000
+	rmw	@500  ;640
+e3	swi
+	FCC
+	FCC	"
+	FCC	"H
+	FCC	H"
+	DS
+	FCB	$ff
+	DS.B	$M
+	RMB	80000
+	org $0
+e4	adca	$3
+	DS.W
+	DS.W	%M
+	RMW	80000
+EN5	EQU	2
+e3	ldaa	5
+fin	FCC "Solía \\ ñ \ ; mas"
+EN4	END

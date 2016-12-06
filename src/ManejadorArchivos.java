@@ -1,4 +1,7 @@
 import Tokens.Codop;
+import Tokens.Etiqueta;
+import Tokens.ReporteDirectiva;
+import Tokens.ValidadorDirectivas;
 
 import java.io.*;
 import java.util.Scanner;
@@ -21,10 +24,8 @@ public class ManejadorArchivos {
     private Tabop tabop ;
     private File ins;
     private File err;
-    private File tabsim;
     private BufferedWriter salidaInstrucciones;
     private BufferedWriter salidaErrores;
-    private BufferedWriter salidaTabSim;
 
     ManejadorArchivos(String ruta){
         this.ruta = ruta;
@@ -33,11 +34,10 @@ public class ManejadorArchivos {
         tabop = new Tabop();
         ins = new File("/home/mario/IdeaProjects/Programación de sistemas/test" + ".INS");
         err = new File("/home/mario/IdeaProjects/Programación de sistemas/test" + ".ERR");
-        tabsim = new File("/home/mario/IdeaProjects/Programación de sistemas/test" + ".TDS");
         try {
             salidaInstrucciones = new BufferedWriter( new FileWriter( ins, true ) );
             salidaErrores = new BufferedWriter( new FileWriter( err,true) );
-            salidaTabSim = new BufferedWriter( new FileWriter( tabsim,true) );
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -61,8 +61,14 @@ public class ManejadorArchivos {
         tabop.carga_tabop();
         Linea linea = new Linea();
         short numLinea = 0;
-        boolean existe_org = true;
+        boolean existe_org = false;
         boolean was_equ = false;
+        int cont_loc = 0;
+
+        TabSim tab_sim = new TabSim();
+        System.out.println( new String( "Solía \\\\ ñ \\ ; mas" ).length() - 2 );
+
+
 
         while ( linea.getCodop() != "END" && lector.hasNextLine() ) {
             boolean escribir = true;
@@ -71,8 +77,11 @@ public class ManejadorArchivos {
             linea.setComentario(false);
             linea.setNumeroLinea(numLinea);
             linea.resetLinea();
+            Codop codop_f = null;
             was_equ = false;
             boolean existeCodop = false;
+            ReporteDirectiva reporte_directiva;
+            Etiqueta temporal;
 
 
             if( linea.analizar_linea() ) {
@@ -82,14 +91,26 @@ public class ManejadorArchivos {
                 }  else if ( linea.getCodop().equals( "EQU" ) ) {
                     if ( !linea.getEtq().equals("") && !linea.getEtq().equals("NULL")  ) {
                         if ( !linea.getOper().equals("NULL") && !linea.getOper().equals("")  ) {
-                            //aquí, tal vez sea necesario hacer una funcion "escribeEnTabSim()"
-                            salidaTabSim.write( linea.getEtq() + "      " + linea.getOper() );
-                            salidaInstrucciones.write( linea.getNumeroLinea() + " cont_loc " + linea.getEtq() + " " + linea.getCodop() + " " + linea.getOper() + "\n");
+                             temporal =  new Etiqueta(linea.getEtq(), linea.getOper());
+                            if ( !tab_sim.existeEtiqueta( temporal )  ) { //agregar una verificacion de rango
+                                if ( Integer.parseInt( linea.getOper() ) <= 65635 ) {
+                                    tab_sim.agregaEtiqueta( temporal );
+                                    System.out.println( linea.getNumeroLinea() + "  " +  Integer.parseInt( String.valueOf( cont_loc ) )  + "  " + linea.getEtq() + "  " + linea.getCodop() + "    " + linea.getOper() + "\n" );
+                                    salidaInstrucciones.write( linea.getNumeroLinea() + "   "+ Integer.toHexString(  cont_loc ) +"  " + linea.getEtq() + " " + linea.getCodop() + " " + linea.getOper() + "\n");
+                                }
+                                else {
+                                    salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "  -> Valor fuera de rango" + "\n" );
+                                }
+
+                            } else {
+                                salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "  -> Etiqueta repetida" + "\n" );
+                            }
+
                         } else {
                             salidaErrores.write(linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "  -> EQU debe tener un operando" + "\n");
                         }
 
-                    }else {
+                    } else {
                         salidaErrores.write(linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "  -> EQU debe tener una etiqueta" + "\n");
                     }
                     was_equ = true;
@@ -98,23 +119,38 @@ public class ManejadorArchivos {
                     //se prepara la línea que se escribirá en el archivo .ins
                     linea.setLineaEscribir();
 
+
                     for ( Codop codop : tabop.getTabop() ) {
                         //si el codop cargado en memoria desde el tabop.txt es = codop de Linea
-
+                        codop_f = codop;
                         if( codop.getCodop().equals( linea.getCodop() )  ) {
+                            if ( existe_org && linea.getCodop().equals("ORG") ) {
+                                salidaErrores.write( linea.getNumeroLinea() + "     " + linea.getLineaOriginal() + "    " + " Ya existe un org en el archivo \n" );
+                            }
 
                             if ( !codop.usaOper() &&
                                     ( linea.getOper().equals("") || linea.getOper().equals("NULL") ) && existe_org ){
                                 existeCodop = true;
                                 escribir = false;
                                 linea.setLineaOriginal( linea.getLineaOriginal() + "   " +  codop.getModoDirec() );
-                                salidaInstrucciones.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + " \n"  );
+                                cont_loc = cont_loc + Integer.parseInt( codop.getBytesCalculados());
+                                salidaInstrucciones.write( linea.getNumeroLinea() + "   " + Integer.toHexString(  cont_loc  ) + "    " + linea.getLineaOriginal() + " \n"  );
+                                if ( !linea.getEtq().equals("NULL") || !linea.getEtq().equals("")  ) { //aquí escribimos y verificamos el tabsim }
+                                    //System.out.println( linea.getEtq() + "etq" );
+                                    if ( !tab_sim.existeEtiqueta( new Etiqueta( linea.getEtq() , String.valueOf( cont_loc )  ) )) {
+                                        tab_sim.agregaEtiqueta( new Etiqueta( linea.getEtq() , String.valueOf( cont_loc )  ));
+                                    } else {
+                                        salidaErrores.write( linea.getNumeroLinea() + "     "+ linea.getLineaOriginal() + " ->etiqueta repetida" );
+                                    }
+                                }
                             } else if ( codop.usaOper() && //no es nulo o está vacío el operando
-                                    ( !linea.getOper().equals("") && !linea.getOper().equals("NULL") ) && existe_org ) {
+                                    ( !linea.getOper().equals("") && !linea.getOper().equals("NULL") )  ) { //&& existe_org
                                 existeCodop = true;
+                                cont_loc = cont_loc + Integer.parseInt( codop.getBytesCalculados() );
                                 linea.setLineaOriginal( linea.getLineaOriginal() + "    " +  codop.getModoDirec() );
-
-                            } else if( codop.usaOper() && ( linea.getOper().equals( "" ) || linea.getOper().equals( "NULL" ) ) && existe_org ) {
+                                temporal = new Etiqueta( linea.getEtq(), linea.getOper() );
+                                break;
+                            } else if ( codop.usaOper() && ( linea.getOper().equals( "" ) || linea.getOper().equals( "NULL" ) ) && existe_org ) {
                                 linea.set_error( " El codop utiliza operando y no tiene" );
                                 escribir = false;
                                 salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
@@ -132,24 +168,46 @@ public class ManejadorArchivos {
                       /*Si se termina el ciclo que recorre el arrayList (tabop) y no encontró el codop:
                       * escribir en el archivo de errores.
                       * */
-                    if( !existeCodop && existe_org ){
+                    if( !existeCodop && existe_org ) {
                         //aquí debemos de revisar si pertenece a alguna de las directivas.
-                        if ( linea.verificaDirectivas() ) {
 
+                        reporte_directiva = ValidadorDirectivas.analizaDirectiva( linea.getCodop(), linea.getOper() );
+
+                        if ( reporte_directiva.Es_directiva() ) {
+                            if ( !reporte_directiva.Es_error() ) {
+                                cont_loc = cont_loc + reporte_directiva.getAumentar_contLoc();
+                                System.out.println( linea.getNumeroLinea() + "  " +  Integer.parseInt( String.valueOf( cont_loc ) )  + "  " + linea.getEtq() + "  " + linea.getCodop() + "    " + linea.getOper() + "\n" );
+                                salidaInstrucciones.write(linea.getNumeroLinea() + "  " +  Integer.toHexString( cont_loc )  + "  " + linea.getEtq() + "  " + linea.getCodop() + "    " + linea.getOper() + "\n");
+                                //escribe en el archivo de tabla de simbolos?
+                                if ( !linea.getEtq().equals("NULL") && !linea.getEtq().equals("")  ) { //aquí escribimos y verificamos el tabsim }
+                                    //System.out.println( linea.getEtq() + "etq" );
+                                    if ( !tab_sim.existeEtiqueta( new Etiqueta( linea.getEtq() , String.valueOf( cont_loc ) )  ) ) {
+                                        tab_sim.agregaEtiqueta( new Etiqueta( linea.getEtq() ,  String.valueOf( cont_loc )    ) );
+                                    } else {
+                                        salidaErrores.write( linea.getNumeroLinea() + "     "+ linea.getLineaOriginal() + " ->etiqueta repetida" );
+                                    }
+                                }
+
+                            } else {
+                                salidaErrores.write(linea.getNumeroLinea() + "  " + linea.getLineaOriginal() + "     " + reporte_directiva.getError() + "\n");
+                            }
                         } else {
                             linea.set_error(" El código de operación no existe");
+                            //reporte_directiva = ValidadorDirectivas.analizaDirectiva( linea.getOper(), linea.getOper() );
+
+
                             salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
                         }
-
-
                     }
                     else if( existeCodop && escribir && existe_org ) {
                           /*Modificaciones en este archivo para práctica 3*/
                         //aquí verificar el operando con los modos de direccionamiento
                         if ( linea.verificaOperando() || linea.getCodop().equals("END") ) {
-                            salidaInstrucciones.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "   Modo correspondiente:  "+ linea.getModo_direccionamiento_linea() + " \n" );
+                            cont_loc = cont_loc + Integer.parseInt( codop_f.getBytesCalculados() );
+                            salidaInstrucciones.write( linea.getNumeroLinea() + "   " + Integer.toHexString(  cont_loc  ) + "    " + linea.getLineaOriginal() + "   Modo correspondiente:  "+ linea.getModo_direccionamiento_linea() + " \n" );
+
                         } else {
-                            System.out.println( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n"  );
+
                             salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
                         }
                         //salidaInstrucciones.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "\n" );
@@ -157,26 +215,30 @@ public class ManejadorArchivos {
 
                     if ( !existe_org && linea.getCodop().equals("ORG") ) { //aquí deberíamos iniciar el cont_loc
                         if ( linea.verificaOperando() ) {
-                            salidaInstrucciones.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "   Modo correspondiente:  "+ linea.getModo_direccionamiento_linea() + " \n" );
+                            cont_loc = ValidadorDirectivas.cambiaBaseNumericaDecimal( linea.getOper().charAt( 0 ) , linea.getOper().substring( 1 ) );
+
+                            salidaInstrucciones.write( linea.getNumeroLinea() + "      " + Integer.toHexString(  cont_loc  )+ "     " + linea.getLineaOriginal() + "   Modo correspondiente:  "+ linea.getModo_direccionamiento_linea() + " \n" );
                             existe_org = true;
                         } else  {
-                            salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
+                            salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "     "+linea.getError() + "\n" );
                             break;
                         }
 
                     }
+
                         /*Si ya se ha leído la etq END terminar el ciclo, además de que el operando debe ser nulo*/
                     if( linea.getCodop().contains("END") &&
                             ( linea.getOper().equals( "NULL" ) || linea.getCodop().contains( "NULL" ) ) ){
                         linea.setEnd(true);
-                        salidaInstrucciones.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "\n" );
-                        System.out.println("Entra al break " + linea.getEnd() );
+                        cont_loc = cont_loc + Integer.parseInt( codop_f.getBytesCalculados() );
+                        salidaInstrucciones.write( linea.getNumeroLinea() + "   " + Integer.toHexString( cont_loc ) + "  " + linea.getLineaOriginal() + "\n" );
+
                         break;
                     }
                     else if( linea.getCodop().contains( "END" ) &&
                             ( !linea.getOper().equals( "" ) && !linea.getCodop().contains( "NULL" ) ) ){
                         linea.setEnd(true);
-                        System.out.println("Entra al break 2 " + linea.getEnd() );
+
                         break;
                     }
                 }
@@ -184,9 +246,67 @@ public class ManejadorArchivos {
             else {
                 //escribir en archivo de errores
 
-                if( linea.es_comentario() ){ was_equ = true;/*omitimos acción de escritura*/ }
+                if( linea.es_comentario() ) {
+                    was_equ = true;/*omitimos acción de escritura*/
+                    if ( linea.getCodop().equals( "FCC" ) ) {
+                        reporte_directiva = ValidadorDirectivas.analizaDirectiva( linea.getCodop(), "\""+linea.getLineaOriginal().split("\"")[1]+"\"" );
+                        linea.setOper( "\""+linea.getLineaOriginal().split("\"")[1]+"\"" );
+                        salidaInstrucciones.write(linea.getNumeroLinea() + "  " +  Integer.toHexString( cont_loc )  + "  " + linea.getEtq() + "  " + linea.getCodop() + "    " + linea.getOper() + "\n");
+
+                        if ( !linea.getEtq().equals("NULL") && !tab_sim.existeEtiqueta( new Etiqueta( linea.getEtq() , linea.getOper() )  ) ) {
+                            tab_sim.agregaEtiqueta( new Etiqueta( linea.getEtq() ,  linea.getOper()    ) );
+                        } else {
+                            salidaErrores.write( linea.getNumeroLinea() + "     "+ linea.getLineaOriginal() + " ->etiqueta repetida" );
+                        }
+
+
+                    } else if ( linea.getCodop().isEmpty() ) {
+                        continue;
+                    }else {
+                        reporte_directiva = ValidadorDirectivas.analizaDirectiva( linea.getCodop(), linea.getOper() );
+                    }
+
+
+                    if ( reporte_directiva.Es_directiva() ) {
+                        if ( !reporte_directiva.Es_error() ) {
+                            cont_loc = cont_loc + reporte_directiva.getAumentar_contLoc();
+                            salidaInstrucciones.write(linea.getNumeroLinea() + "  " +  Integer.toHexString(  cont_loc  )  + "  " + linea.getEtq() + "  " + linea.getCodop() + "    " + linea.getOper() + "\n");
+                            //escribe en el archivo de tabla de simbolos?
+                        } else {
+                            salidaErrores.write(linea.getNumeroLinea() + "  " + linea.getLineaOriginal() + "    " +reporte_directiva.getError() + "\n" );
+                        }
+                    } else {
+                        linea.set_error(reporte_directiva.getError());
+                        salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "    " +linea.getError() + "\n" );
+                    }
+
+
+                }
                 else if ( existe_org ) {
-                    salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
+
+                    if ( linea.getCodop().equals( "FCC" ) ) {
+                        reporte_directiva = ValidadorDirectivas.analizaDirectiva( linea.getCodop(), "\""+linea.getLineaOriginal().split("\"")[1]+"\"" );
+                        linea.setOper( "\""+linea.getLineaOriginal().split("\"")[1]+"\"" );
+                        salidaInstrucciones.write(linea.getNumeroLinea() + "  " +  Integer.toHexString( cont_loc )  + "  " + linea.getEtq() + "  " + linea.getCodop() + "    " + linea.getOper() + "\n");
+                    } else {
+                        reporte_directiva = ValidadorDirectivas.analizaDirectiva( linea.getCodop(), linea.getOper() );
+                    }
+
+
+                    if ( reporte_directiva.Es_directiva() ) {
+                        if ( !reporte_directiva.Es_error() ) {
+                            cont_loc = cont_loc + reporte_directiva.getAumentar_contLoc();
+                            salidaInstrucciones.write(linea.getNumeroLinea() + "  " +  Integer.toHexString( cont_loc )  + "  " + linea.getEtq() + "  " + linea.getCodop() + "    " + linea.getOper() + "\n");
+                            //escribe en el archivo de tabla de simbolos?
+                        } else {
+                            salidaErrores.write(linea.getNumeroLinea() + "  " + linea.getLineaOriginal() + "    " +reporte_directiva.getError() + "\n" );
+                        }
+                    } else {
+                        linea.set_error(reporte_directiva.getError());
+                        salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + "    " +linea.getError() + "\n" );
+                    }
+
+                    //salidaErrores.write( linea.getNumeroLinea() + "    " + linea.getLineaOriginal() + linea.getError() + "\n" );
                 }
             }
             if ( !existe_org && !was_equ ) { break; }
@@ -194,9 +314,10 @@ public class ManejadorArchivos {
         if( !linea.getEnd() && existe_org){
             salidaErrores.write( linea.getNumeroLinea() + "     " + "No existe END en el archivo\n" );
         }
-        if ( !existe_org && !was_equ ){
+        if ( !existe_org  ){
             salidaErrores.write( linea.getNumeroLinea() + "     " + "No inicia con ORG el archivo\n" );
         }
+        tab_sim.escribeTabsim();
         salidaInstrucciones.close();
         salidaErrores.close();
     }

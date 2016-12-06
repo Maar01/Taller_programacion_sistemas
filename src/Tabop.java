@@ -39,7 +39,7 @@ public class Tabop {
         String lineaTabop;
         while(lectorTabop.hasNextLine()){
             lineaTabop = lectorTabop.nextLine( );
-            tabop.add(  new Codop(lineaTabop ) );
+            tabop.add(  new Codop( lineaTabop ) );
         }
 
     }

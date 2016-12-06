@@ -355,6 +355,7 @@ public final class ValidadorModoDireccionamiento {
         } else if  ( registroCorrecto ) {
 
             if ( esDigito( tokensIDX[0].charAt(0) ) ) {
+
                 numero = Integer.parseInt( tokensIDX[0] );
                 if( numero <= RANGO_MAXIMO_IDX && numero >= RANGO_MINIMO_IDX  && tokensIDX.length < 6 ) {
                     reporte.setError(false);
