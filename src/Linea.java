@@ -402,12 +402,12 @@ public class Linea {
         operando = operando.trim();
         ReporteModoDireccionamiento reporte = new ReporteModoDireccionamiento();
         boolean ningun_modo = false;
-        if ( operando.contains(",") && ( operando.contains("+") || operando.contains("-") )) {
+        /*if ( operando.contains(",") && ( operando.contains("+") || operando.contains("-") )) {
             if ( operando.split(",")[1].contains("+") || operando.split(",")[1].contains( "-" ) ) {
                 reporte = ValidadorModoDireccionamiento.esIDXPrePost( operando, reporte );
                 bandera_aux = true;
             }
-        }  if ( !bandera_aux ) {
+        }*/  if ( !bandera_aux ) {
 
             for( int index = 1; index < modos_direccionamiento_aceptados.length; index++ ) {
                 switch ( modos_direccionamiento_aceptados[index] ) {
@@ -436,14 +436,14 @@ public class Linea {
 
                     case "IDX":
                         reporte = ValidadorModoDireccionamiento.esIDX( operando, reporte );
-                        if ( !reporte.isError() )
+                        if ( reporte.isError() )
                         {
                             reporte = ValidadorModoDireccionamiento.esIDXAcumulador( operando, reporte );
                         }
-                        if ( !reporte.isError() ){
+                        if ( reporte.isError() ){
                             reporte = ValidadorModoDireccionamiento.esIDXPrePost( operando, reporte );
                         }
-                        if ( !reporte.isError() ) {
+                        if ( reporte.isError() ) {
                             reporte.setMensaje_error( reporte.getMensaje_error() );
                             reporte.setError(true);
                         }

@@ -23,8 +23,8 @@ public final class ValidadorModoDireccionamiento {
     private final static byte RANGO_MINIMO_IDX = -16;
     private final static byte RANGO_MAXIMO_IDX = 15;
 
-    private final static byte RANGO_MINIMO_IDX_PRE_POST = 8;
-    private final static byte RANGO_MAXIMO_IDX_PRE_POST = 1;
+    private final static byte RANGO_MINIMO_IDX_PRE_POST = 1;
+    private final static byte RANGO_MAXIMO_IDX_PRE_POST = 8;
 
     private final static char[] IDX_ACUMULADOR = { 'A', 'B', 'D' };
     private final static byte RANGO_MAXIMO_IDX_ACUMULADOR = 15;
@@ -512,7 +512,7 @@ public final class ValidadorModoDireccionamiento {
 
         if ( tokensIDX.length > 1 ) {
             for( int index = 0; index < REGISTROS_IDX.length; index++ ) {
-                if( tokensIDX[1].equals( REGISTROS_IDX[index] )){
+                if( tokensIDX[1].toUpperCase().equals( REGISTROS_IDX[index] )){
                     registroCorrecto = true;
                     break;
                 }
@@ -526,6 +526,12 @@ public final class ValidadorModoDireccionamiento {
                     reporte.setMensaje_error("");
                     return reporte;
                 } else {
+                    if ( !registroCorrecto ) {
+                        reporte.setError(true);
+                        reporte.setMensaje_error(" Error en el registro");
+                        reporte.setError_final(false);
+                        return reporte;
+                    }
                     reporte.setError(true);
                     reporte.setMensaje_error("Operando fuera de rango para IDX2");
                     reporte.setError_final(true);
@@ -692,7 +698,7 @@ public final class ValidadorModoDireccionamiento {
                 numero = Integer.parseInt( tokensIDX[0] );
 
                 if( numero <= RANGO_MAXIMO_IDX_PRE_POST && numero >= RANGO_MINIMO_IDX_PRE_POST && registroCorrecto ) {
-                    reporte.setError(true);
+                    reporte.setError(false);
                     reporte.setMensaje_error("");
                     reporte.setModo_direccionamiento("IDX pre / post");
                     return reporte;
@@ -722,7 +728,7 @@ public final class ValidadorModoDireccionamiento {
 
         }
 
-        if ( tokensIDX[1].contains("+" ) || tokensIDX[1].contains("-") ) {
+       /* if ( tokensIDX[1].contains("+" ) || tokensIDX[1].contains("-") ) {
             reporte.setError(true);
             reporte.setMensaje_error(" El registro no se reconoce IDX pre / post");
             reporte.setModo_direccionamiento("IDX pre / post");
@@ -731,7 +737,7 @@ public final class ValidadorModoDireccionamiento {
             reporte.setError(true);
             reporte.setMensaje_error(" El registro no se reconoce IDX pre / post");
             reporte.setModo_direccionamiento("IDX pre / post");
-        }
+        }*/
 
         return reporte;
     }
