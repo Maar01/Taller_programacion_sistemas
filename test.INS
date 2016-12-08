@@ -1,23 +1,19 @@
-4      0        NULL     ORG    0    DIR   Modo correspondiente:  DIR 
-5   0  EN3 EQU 3
-11  2  NULL  DW    2
-12  3  NULL  DB    2
-13  5  NULL  DC.W    2
-14  6  NULL  DC.B    2
-15  7  e1  FCB    2
-16  9  NULL  FDB    2222
-17  2b  NULL  DS    34
-18  4d  NULL  DS.B    34
-19  91  NULL  DS.W    34
-20  b3  e2  RMB    34
-21  f7  NULL  RMW    34
-22  f7  NULL  FCC    "HOLA MUNDO"
-22  101  NULL  FCC    "HOLA MUNDO"
-26  381  NULL  RMW    @500
-27   382       e3     SWI    NULL   INH 
-36   382       NULL     ORG    $0    DIR   Modo correspondiente:  DIR 
-41   383  EN5 EQU 2
-43  384  fin  FCC    "Solía \\ ñ \ ; mas"
-43  396  fin  FCC    "Solía \\ ñ \ ; mas"
-44   396       EN4     END    NULL   DIR 
-44   398     EN4     END    NULL   DIR
+1     7d    NULL     ORG     125       DIR      
+2     7f    NULL     STS     ,Y        IDX1   5Fe800
+3     81    NULL     STS     0,PC        IDX1   5F7c00
+4     83    NULL     STS     2,SP        IDX1   5F7800
+5     85    NULL     STS     -2,X        IDX1   5F1110000
+6     87    NULL     STS     41,X        IDX1   5F1110000
+7     89    NULL     STS     -41,Y        IDX1   5Fe800
+8     8b    NULL     STS     65500,PC         IDX2   5Fe800
+14     92    E2     LDAA     ,X        IDX1   861110000
+16     95    E4     LDAA     @1,SP        IDX1   867800
+19     99    E7     LDAA     -16,Y        IDX1   86e800
+23     9d    NULL     LDAA     34,X        IDX1   861110000
+25     a0    NULL     LDAA     $0FB,X        IDX1   861110000
+28     a3    NULL     LDAA     31483,PC         IDX2   867800
+35     a9    NULL     STAA     %01,-SP        IDX pre / post   5Aa1
+36     ab    NULL     STAA     @1,SP-        IDX pre / post   5Ab1
+37     ad    NULL     STX     $2,SP+        IDX pre / post   5Eb2
+38     af    e7     STX     $2,+SP        IDX pre / post   5Ea2
+40   b1     NULL     END    NULL   DIR

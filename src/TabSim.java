@@ -60,7 +60,12 @@ public class TabSim {
     public void escribeTabsim() {
         for ( Etiqueta etiqueta: tabSim   ) {
             try {
-                salidaTabSim.write( etiqueta.getEtiqueta() + "      " + etiqueta.getValor_etiqueta() + "\n");
+                if (etiqueta.getEtiqueta().equals("NULL") ) {
+
+                }else {
+                    salidaTabSim.write( etiqueta.getEtiqueta() + "      " + etiqueta.getValor_etiqueta() + "\n");
+                }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }

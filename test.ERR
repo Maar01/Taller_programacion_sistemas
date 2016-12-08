@@ -1,25 +1,16 @@
-1    	EQU  -> EQU debe tener una etiqueta
-2    	EQU	4  -> EQU debe tener una etiqueta
-3    EN2	EQU	80000  -> Valor fuera de rango
-6     NULL     DB    NULL      Sin operando válido.
-7    	DC.B	$M    Error en formato de número
-8     NULL     FCB    80000     Número fuera de rango para directiva de constantes 1 byte
-9     NULL     DW    NULL      Sin operando válido.
-10    RMB	80000    No es directiva ni codigo de operación
-23    	DC.W	@M    Error en formato de número
-24     DC.W	@8500    Error en formato de número
-25     NULL     FDB    80000     Número fuera de rango para directiva de constantes 2 byte
-28     NULL     FCC    NULL     Operando invalido para FCC
-29     NULL     FCC    "     Operando para FCC deben iniciar y terminar con comillas
-30     NULL     FCC    "H     Operando para FCC deben iniciar y terminar con comillas
-31     NULL     FCC    H"     Operando para FCC deben iniciar y terminar con comillas
-32     NULL     DS    NULL      Sin operando válido.
-33     NULL     FCB    $ff     Número fuera de rango para directiva de constantes 1 byte
-34    	DS.B	$M    Error en formato de número
-35     NULL     RMB    80000     Fuera de rango para RMB
-36        NULL     ORG    $0     Ya existe un org en el archivo 
-37       e4     ADCA    $3    IMM Operando no válido para ningún modo de direccionamiento aceptado.
-38  	DS.W     Sin operando válido.
-39    	DS.W	%M    Error en formato de número
-40     NULL     RMW    80000     Fuera de rango para RMW
-42       e3     LDAA    5    IMM Operando no válido para ningún modo de direccionamiento aceptado.
+9       NULL     STS    3,-X    DIR operador fuera de rango para IDX pre/post
+10       NULL     STS    4,Y-    DIR operador fuera de rango para IDX pre/post
+11       NULL     STS    5,+SP    DIR operador fuera de rango para IDX pre/post
+12       NULL     STS    6,X+    DIR operador fuera de rango para IDX pre/post
+13       NULL     STS    D,PC    DIR Operando no válido para ningún modo de direccionamiento aceptado.
+15       NULL     LDAA    0,y    IMM Operando fuera de rango para IDX2
+17       NULL     LDAA    15,pc    IMM Operando fuera de rango para IDX2
+18       NULL     LDAA    -1,x    IMM Operando fuera de rango para IDX2
+20       NULL     STAB    @70,sP    DIR El registro no se reconoce
+22       e2     LDAA    $FF,pC    IMM El registro no se reconoce
+24       NULL     LDAA    -18,y    IMM Operando fuera de rango para IDX2
+26       NULL     LDAA    %010101,sp    IMM El registro no se reconoce
+30       NULL     STAA    1,-SP    DIR operador fuera de rango para IDX pre/post
+31       NULL     STAA    1,SP-    DIR operador fuera de rango para IDX pre/post
+32       NULL     STX    2,SP+    DIR operador fuera de rango para IDX pre/post
+33       e5     STX    2,+SP    DIR operador fuera de rango para IDX pre/post

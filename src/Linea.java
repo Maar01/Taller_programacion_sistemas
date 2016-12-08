@@ -4,8 +4,7 @@
 
 import ModosDireccionamiento.ReporteModoDireccionamiento;
 import ModosDireccionamiento.ValidadorModoDireccionamiento;
-import Tokens.Operando;
-import Tokens.Validador;
+import Tokens.*;
 
 /**
  * Clase encargada de analizar y almacenar la información resultante
@@ -25,8 +24,16 @@ public class Linea {
     private String         error = "";
     private String comentarioStr = "";
     private String modo_direccionamiento_linea;
+    private String codigo_maquina = "";
+
+    private Codop codop_obj;
+    private Etiqueta etiqueta_obj;
 
     private String tokens[];
+    private String lineaOriginal2;
+
+
+    private String  modos_dire ;
 
     /**
      *
@@ -50,6 +57,7 @@ public class Linea {
     public void setLineaOriginal(String lineaOriginal) {
 
         this.lineaOriginal = lineaOriginal;
+        
         this.setLineaCopia(lineaOriginal);
     }
 
@@ -207,15 +215,15 @@ public class Linea {
                             if(Validador.es_operando(tokens[Validador.POSICION_OPERANDO])){
                                 return true;
                             }else{ this.error = " El formato de OPERANDO no es correcto"; }
-                    }else{ this.error = " El formato de CODOP no es correcto"; }
-                }else{ this.error = " El formato de OPERANDO no es correcto"; }
+                    } else { this.error = " El formato de CODOP no es correcto"; }
+                } else { this.error = " El formato de OPERANDO no es correcto"; }
                             
                     break;
 
                 case Validador._CODOP_:
                     if( Validador.es_codop( tokens[Validador.POSICION_CODOP] ) ) {
                         return true;
-                    }else{ this.error = " El formato del CODOP no es correcto" ;}
+                    } else { this.error = " El formato del CODOP no es correcto" ;}
                     break;
 
                 case Validador.ETQ_CODOP_OP_COM:
@@ -285,7 +293,7 @@ public class Linea {
      * Imprime en consola los tokens identificados en la línea a partir de
      * set_token()
      */
-    public void muestra_tokens(){
+    public void muestra_tokens() {
         for(int i = 0; i < tokens.length; i++){
             if( tokens[i].equals("") ){
                 show("espacio 'vacio' ");
@@ -388,17 +396,20 @@ public class Linea {
         if ( operando.length() > 16 ) {
             operando = operando.charAt(0)+""+ operando.substring( operando.length() - 16 );
         }
-
+        boolean bandera_aux = false;
         String[] modos_direccionamiento_aceptados;
-        modos_direccionamiento_aceptados = lineaOriginal.split( "\\s+" );
+        modos_direccionamiento_aceptados = modos_dire.split( "\\s+" );
         operando = operando.trim();
         ReporteModoDireccionamiento reporte = new ReporteModoDireccionamiento();
         boolean ningun_modo = false;
+        if ( operando.contains(",") && ( operando.contains("+") || operando.contains("-") )) {
+            if ( operando.split(",")[1].contains("+") || operando.split(",")[1].contains( "-" ) ) {
+                reporte = ValidadorModoDireccionamiento.esIDXPrePost( operando, reporte );
+                bandera_aux = true;
+            }
+        }  if ( !bandera_aux ) {
 
-        if ( operando.contains("+") || operando.contains( "-" ) ) {
-            reporte = ValidadorModoDireccionamiento.esIDXPrePost( operando, reporte );
-        } else {
-            for( int index = 4; index < modos_direccionamiento_aceptados.length; index++ ) {
+            for( int index = 1; index < modos_direccionamiento_aceptados.length; index++ ) {
                 switch ( modos_direccionamiento_aceptados[index] ) {
 
                     case "INH":
@@ -408,7 +419,7 @@ public class Linea {
                     case "IMM":
                         reporte = ValidadorModoDireccionamiento.esInmediato8( operando, reporte );//tal vez aqui unificar el de 8 y 16
 
-                        if( reporte.isError() ) {
+                        if ( reporte.isError() ) {
 
                             reporte = ValidadorModoDireccionamiento.esInmediato16( operando, reporte );
                         }
@@ -499,12 +510,87 @@ public class Linea {
         }
 
         this.modo_direccionamiento_linea = reporte.getModo_direccionamiento();
-
+        set_codMaquina();
         if ( reporte.isError() ) {
-            return false;
+            if ( codop.equals("ORG") ) {
+                return true;
+            } else {
+                return false;
+            }
+
         } else {
             return true;
         }
+    }
+
+    private void set_codMaquina (  ) {
+
+
+        if ( !this.codop.equals("ORG") && !this.codop.equals("END") ) {
+            showln( this.codop + "num" + numeroLinea+ "modo_dir" + this.modo_direccionamiento_linea);
+            switch ( this.modo_direccionamiento_linea ) {
+                case "INH" :
+                    codigo_maquina =   codop_obj.getCodMaquina().split(" ")[0] ;
+
+                    break;
+
+                case "DIR" :
+                    codigo_maquina = codop_obj.getCodMaquina().split(" ")[0];
+                    codigo_maquina =  codigo_maquina.concat( this.etiqueta_obj.getValor_etiqueta() );
+                    break;
+
+                case "EXT":
+                    codigo_maquina = codop_obj.getCodMaquina().split(" ")[0];
+                    if ( Validador.es_etiqueta( oper ) ) {
+                        System.out.println( "EXT " + etiqueta_obj.getValor_etiqueta() );
+                       codigo_maquina =  codigo_maquina.concat(  etiqueta_obj.getValor_etiqueta()  );
+
+                    } else {
+                        codigo_maquina = codop_obj.getCodMaquina().split(" ")[0];
+
+                        codigo_maquina = codigo_maquina.concat( Integer.toHexString(    ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( getOper().charAt(0), getOper().substring(1) )  )  );
+                    }
+                    break;
+
+                case "IMM8":case "IMM16":
+                    codigo_maquina = codop_obj.getCodMaquina().split(" ")[0];
+                    System.out.print(  getOper() + " oper\n");
+
+                    try {
+                        codigo_maquina = codigo_maquina.concat( Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( getOper().charAt(1), getOper().substring(2) )  ) );
+                    } catch(NumberFormatException e) {
+                        codigo_maquina = codigo_maquina.concat( Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( getOper().charAt(1), getOper().substring(1) )  ) );
+                    }
+
+                    break;
+//p_6
+                case "IDX" :case "IDX pre / post":
+
+                    if ( oper.contains("-") || oper.contains("+") ) {
+                        codigo_maquina = codigoMaquinaPrePost();
+                    } else if ( oper.contains( "A" ) || oper.contains( "B" ) || oper.contains( "D" )  ) {
+                        codigo_maquina = codigoMaquinaIDXAcumulador();
+                    } else {
+                        codigo_maquina = codigoMaquinaIdx();
+                    }
+
+                    break;
+
+                case "IDX1" :case "IDX2":
+                    codigo_maquina = codigoMaquinaIDX1_2();
+                    break;
+
+                case "[IDX2]":
+                    oper = oper.substring( 1, oper.length()-2 ); // o -1 para quitar corchetes
+                    codigo_maquina = codigoMaquinaIDX1_2();
+                    break;
+
+
+
+
+            }
+        }
+
     }
 
     public String getModo_direccionamiento_linea() {
@@ -514,4 +600,275 @@ public class Linea {
     public boolean verificaDirectivas() {
         return false;
     }
+
+    public void setCodop_obj( Codop codop_obj ) {
+        this.codop_obj = codop_obj;
+    }
+
+    public void setEtiqueta_obj ( Etiqueta etiqueta ) {
+        this.etiqueta_obj = etiqueta;
+    }
+
+    public String get_codigoMaquina() {
+        return this.codigo_maquina;
+    }
+
+    public String codigoMaquinaIdx(  ) {
+        String retorno = "";
+
+        if ( oper.split(",").length <= 2  ) {
+            switch ( oper.substring( 1 ).toUpperCase() ){
+                case "X":
+                    retorno = codop_obj.getCodMaquina().split(" ")[0] + "00";//"%0000";
+                    break;
+                case "Y": //010
+                    retorno = codop_obj.getCodMaquina().split(" ")[0] + Integer.toHexString( ValidadorDirectivas.cambiaBaseNumericaDecimal( '%', "0100" )  );
+                    break;
+                case "SP":
+                    retorno = codop_obj.getCodMaquina().split(" ")[0] + Integer.toHexString( ValidadorDirectivas.cambiaBaseNumericaDecimal( '%', "1000" )  );
+                    break;
+                case "PC":
+                    retorno = codop_obj.getCodMaquina().split(" ")[0] + Integer.toHexString( ValidadorDirectivas.cambiaBaseNumericaDecimal( '%', "1100" )  );
+                    break;
+            }
+        } else {
+            String codigo_parte2 = Integer.toBinaryString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( oper.split(",")[0].charAt(0), oper.split(",")[0].substring(1)  ) );//"%0000";
+            if ( codigo_parte2.length() < 5 ) {
+                for ( int i = 0; i < 5-codigo_parte2.length(); i++  ) {
+                    codigo_parte2 = "0" + codigo_parte2;
+                }
+            }
+
+            switch ( oper.substring(1).toUpperCase() ) {
+                case "X":
+                    retorno = "000" + codigo_parte2  ;//"%0000";
+                    retorno =  codop_obj.getCodMaquina().split(",")[0] + Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring(0,3) )  ).concat(Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring( 4,7 ) )  )) ;
+                    break;
+                case "Y": //010
+                    retorno = "010" + codigo_parte2 ;
+                    retorno =   codop_obj.getCodMaquina().split(",")[0] + Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring(0,3) )  ).concat(Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring( 4,7 ) )  )) ;
+                    break;
+                case "SP":
+                    retorno = "100" + codigo_parte2;
+                    retorno =  codop_obj.getCodMaquina().split(",")[0] + Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring(0,3) )  ).concat(Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring( 4,7 ) )  )) ;
+                    break;
+                case "PC":
+                    retorno = "110" + codigo_parte2;
+                    retorno = codop_obj.getCodMaquina().split(",")[0] + Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring(0,3) )  ).concat(Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring( 4,7 ) )  )) ;
+                    break;
+            }
+        }
+        return   retorno;
+    }
+
+    public String codigoMaquinaIDX1_2() {
+
+        String retorno = "111" ;
+        String S = "0";
+
+        if ( oper.split(",").length <= 2  ) {
+            switch ( oper.split(",")[1].toUpperCase() ){
+                case "X":
+                    retorno = codop_obj.getCodMaquina().split(" ")[0] + retorno + "0000";//"%0000";
+                    break;
+                case "Y": //se le agrega un cero a la izquierda para que el conversor no lo detecte como negativo
+                    retorno = codop_obj.getCodMaquina().split(" ")[0] + Integer.toHexString( ValidadorDirectivas.cambiaBaseNumericaDecimal( '%', "011101000" )  ) + "00";
+                    break;
+                case "SP":
+                    retorno = codop_obj.getCodMaquina().split(" ")[0] + Integer.toHexString( ValidadorDirectivas.cambiaBaseNumericaDecimal( '%', "01111000" )  ) + "00";
+                    break;
+                case "PC":
+                    retorno = codop_obj.getCodMaquina().split(" ")[0] + Integer.toHexString( ValidadorDirectivas.cambiaBaseNumericaDecimal( '%', "01111100" )  ) + "00";
+                    showln( retorno + "retorno" );
+                    break;
+            }
+        } else {
+
+            if ( Integer.parseInt( oper.split( "," )[0] ) < 0 ) {
+                S = "1";
+            }
+
+            switch ( oper.substring(1).toUpperCase() ) {
+
+                case "X":
+                    retorno = retorno + "0000" + S;//"%0000";
+                    retorno =  Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring(0,4) )  ).concat(Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring( 5,8 ) )  )) ;
+                    retorno = codop_obj.getCodMaquina().split(" ")[0] + retorno +   Integer.toHexString( Integer.parseInt( oper.split( "," )[0] )  ) ;
+                    break;
+                case "Y": //010
+                    retorno = retorno + "0100" + S ;
+                    retorno =  Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring(0,4) )  ).concat(Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring( 5,8 ) )  )) ;
+                    retorno = codop_obj.getCodMaquina().split(" ")[0] + retorno +   Integer.toHexString( Integer.parseInt( oper.split( "," )[0] )  ) ;
+                    break;
+                case "SP":
+                    retorno = retorno + "1000" + S;
+                    retorno =  Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring(0,4) )  ).concat(Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring( 5,8 ) )  )) ;
+                    retorno = codop_obj.getCodMaquina().split(" ")[0] + retorno +   Integer.toHexString( Integer.parseInt( oper.split( "," )[0] )  ) ;
+                    break;
+                case "PC":
+                    retorno = retorno + "1100" + S;
+                    retorno =  Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring(0,4) )  ).concat(Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring( 5,8 ) )  )) ;
+                    retorno = codop_obj.getCodMaquina().split(" ")[0] + retorno +   Integer.toHexString( Integer.parseInt( oper.split( "," )[0] )  ) ;
+                    break;
+            }
+        }
+
+        return  retorno;
+
+    }
+
+    public String codigoMaquinaPrePost() {
+        showln("etra prepost");
+        String rr = "", p = "", n = "", retorno = "";
+        switch ( oper.toUpperCase().split(",")[1] ) {
+            case "-X":
+                rr = "001";
+                 p = "0";
+               //  n =  Integer.toBinaryString( Integer.parseInt( oper.split(",")[0] ) );
+                retorno = Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%',  rr.concat(p)  ) );
+                //retorno = retorno.concat( Integer.toHexString( Integer.parseInt( oper.split(",")[0] ) ) ) ;
+                try{
+                    retorno = retorno.concat( Integer.toHexString(   ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( oper.split(",")[0].charAt(0), oper.split(",")[0].substring(1) )   ) ) ;
+                }catch( NumberFormatException e ) {
+
+                }
+
+                break;
+            case "+X":
+                rr = "001";
+                p = "0";
+               // n =  Integer.toBinaryString( Integer.parseInt( oper.split(",")[0] ) );
+                retorno = Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%',  rr.concat(p)  ) );
+                //retorno = retorno.concat( Integer.toHexString( Integer.parseInt( oper.split(",")[0] ) ) ) ;
+                retorno = retorno.concat( Integer.toHexString(   ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( oper.split(",")[0].charAt(0), oper.split(",")[0].substring(1) )   ) ) ;
+                break;
+            case "X-":case "X+":
+                rr = "001";
+                p = "1";
+              //  n =  Integer.toBinaryString( Integer.parseInt( oper.split(",")[0] ) );
+                retorno = Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%',  rr.concat(p)  ) );
+                //retorno = retorno.concat( Integer.toHexString( Integer.parseInt( oper.split(",")[0] ) ) ) ;
+                //retorno = retorno.concat( Integer.toHexString(   ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( oper.split(",")[0].charAt(0), oper.split(",")[0].substring(1) )   ) ) ;
+                try{
+                    retorno = retorno.concat( Integer.toHexString(   ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( oper.split(",")[0].charAt(0), oper.split(",")[0].substring(1) )   ) ) ;
+                } catch ( NumberFormatException e ) {
+                    retorno = retorno.concat( Integer.toHexString(   ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( oper.split(",")[0].charAt(0), oper.split(",")[0].substring(0) )   ) ) ;
+                }
+                break;
+            case "Y-":case "Y+":
+                showln( "entra aca" );
+                rr = "011";
+                p = "1";
+               // n =  Integer.toBinaryString( Integer.parseInt( oper.split(",")[0] ) );
+                retorno = Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%',  rr.concat(p)  ) );
+                //retorno = retorno.concat( Integer.toHexString( Integer.parseInt( oper.split(",")[0] ) ) ) ;
+                try{
+                    retorno = retorno.concat( Integer.toHexString(   ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( oper.split(",")[0].charAt(0), oper.split(",")[0].substring(1) )   ) ) ;
+                } catch ( NumberFormatException e ) {
+                    retorno = retorno.concat( Integer.toHexString(   ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( oper.split(",")[0].charAt(0), oper.split(",")[0].substring(0) )   ) ) ;
+                }
+
+                break;
+            case "-Y":case "+Y":
+                rr = "011";
+                p = "0";
+                //n =  Integer.toBinaryString( Integer.parseInt( oper.split(",")[0] ) );
+                retorno = Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%',  rr.concat(p)  ) );
+                //retorno = retorno.concat( Integer.toHexString( Integer.parseInt( oper.split(",")[0] ) ) ) ;
+                retorno = retorno.concat( Integer.toHexString(   ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( oper.split(",")[0].charAt(0), oper.split(",")[0].substring(1) )   ) ) ;
+                break;
+            case "SP-":case "SP+":
+                rr = "101";
+                p = "1";
+               // n =  Integer.toBinaryString( Integer.parseInt( oper.split(",")[0] ) );
+                retorno = Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%',  rr.concat(p)  ) );
+                //retorno = retorno.concat( Integer.toHexString( Integer.parseInt( oper.split(",")[0] ) ) ) ;
+//                retorno = retorno.concat( Integer.toHexString(   ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( oper.split(",")[0].charAt(0), oper.split(",")[0].substring(1) )   ) ) ;
+                try{
+                    retorno = retorno.concat( Integer.toHexString(   ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( oper.split(",")[0].charAt(0), oper.split(",")[0].substring(1) )   ) ) ;
+                } catch ( NumberFormatException e ) {
+                    retorno = retorno.concat( Integer.toHexString(   ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( oper.split(",")[0].charAt(0), oper.split(",")[0].substring(0) )   ) ) ;
+                }
+                break;
+
+            case "-SP":case "+SP":
+                rr = "101";
+                p = "0";
+                //n =  Integer.toBinaryString( Integer.parseInt( oper.split(",")[0] ) );
+                retorno = Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%',  rr.concat(p)  ) );
+                try{
+                    retorno = retorno.concat( Integer.toHexString(   ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( oper.split(",")[0].charAt(0), oper.split(",")[0].substring(1) )   ) ) ;
+                } catch ( NumberFormatException e ) {
+                    retorno = retorno.concat( Integer.toHexString(   ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( oper.split(",")[0].charAt(0), oper.split(",")[0].substring(0) )   ) ) ;
+                }
+                break;
+            case "PC-":case "PC+":
+                rr = "111";
+                p = "1";
+                //n =  Integer.toBinaryString( Integer.parseInt( oper.split(",")[0] ) );
+                retorno = Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%',  rr.concat(p)  ) );
+                //retorno = retorno.concat( Integer.toHexString( Integer.parseInt( oper.split(",")[0] ) ) ) ;
+                retorno = retorno.concat( Integer.toHexString(   ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( oper.split(",")[0].charAt(0), oper.split(",")[0].substring(1) )   ) ) ;
+                break;
+            case "-PC":case "+PC":
+                rr = "111";
+                p = "0";
+               // n =  Integer.toBinaryString( Integer.parseInt( oper.split(",")[0] ) );
+                retorno = Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%',  rr.concat(p)  ) );
+                //retorno = retorno.concat( Integer.toHexString( Integer.parseInt( oper.split(",")[0] ) ) ) ;
+                retorno = retorno.concat( Integer.toHexString(   ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( oper.split(",")[0].charAt(0), oper.split(",")[0].substring(1) )   ) ) ;
+                break;
+        }
+
+
+        retorno = codop_obj.getCodMaquina().split(" ")[0] + retorno ;
+        return retorno;
+    }
+
+    public String codigoMaquinaIDXAcumulador() {
+        String retorno = "111", aa = "", rr = "";
+
+        if ( oper.toUpperCase().contains( "A" ) ) {
+            aa = "00";
+        } else if ( oper.toUpperCase().contains( "B" ) ) {
+            aa = "01";
+        } else if ( oper.toUpperCase().contains( "D" ) ) {
+            aa = "10";
+        }
+
+        if ( oper.toUpperCase().contains( "X" ) ) {
+            rr = "00";
+        } else if ( oper.toUpperCase().contains( "Y" ) ) {
+            rr = "01";
+        } else if ( oper.toUpperCase().contains( "SP" ) ) {
+            rr = "10";
+        } else if ( oper.toUpperCase().contains( "PC" ) ) {
+            rr = "11";
+        }
+
+        retorno = retorno + rr + "1" + aa;
+        retorno = Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring(0, 3) ) )
+                    .concat( Integer.toHexString( ValidadorModoDireccionamiento.cambiaBaseNumericaDecimal( '%', retorno.substring(4, 7) ) ) );
+
+
+        return codop_obj.getCodMaquina().split(",")[0].concat( retorno );
+    }
+
+    public void setLineaOriginal2(String lineaOriginal2) {
+        this.lineaOriginal2 = lineaOriginal2;
+
+    }
+
+    public String getLineaOriginal2() {
+        return lineaOriginal2;
+    }
+
+    public String getModos_dire() {
+        return modos_dire;
+    }
+
+    public void setModos_dire(String modos_dire) {
+        this.modos_dire = modos_dire;
+    }
+
 }

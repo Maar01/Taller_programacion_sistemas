@@ -669,7 +669,11 @@ public final class ValidadorModoDireccionamiento {
     public static ReporteModoDireccionamiento esIDXPrePost( String operando, ReporteModoDireccionamiento reporte ) {
         int numero;
         if ( operando.startsWith(",") ) {
-            operando = "0" + operando;
+            reporte.setError(true);
+            reporte.setMensaje_error("operador fuera de rango para IDX pre/post");
+            reporte.setModo_direccionamiento("IDX pre / post");
+            reporte.setError_final(true);
+            return reporte;
         }
         String[] tokensIDX = operando.split( "," );
         boolean registroCorrecto = false;
@@ -686,6 +690,7 @@ public final class ValidadorModoDireccionamiento {
         if ( registroCorrecto ) {
             if ( esDigito( tokensIDX[0].charAt(0) ) ) {
                 numero = Integer.parseInt( tokensIDX[0] );
+
                 if( numero <= RANGO_MAXIMO_IDX_PRE_POST && numero >= RANGO_MINIMO_IDX_PRE_POST && registroCorrecto ) {
                     reporte.setError(true);
                     reporte.setMensaje_error("");
@@ -700,7 +705,7 @@ public final class ValidadorModoDireccionamiento {
 
                 }
             } else if ( verificarBaseNumerica( tokensIDX[0].charAt(0) ) ) {
-                numero = cambiaBaseNumericaDecimal( operando.charAt( 0 ), operando.substring(1) );
+                numero = cambiaBaseNumericaDecimal( tokensIDX[0].charAt( 0 ), tokensIDX[0].substring(1) );
                 if( numero <= RANGO_MAXIMO_IDX && numero >= RANGO_MINIMO_IDX && registroCorrecto) {
                     reporte.setError(false);
                     reporte.setMensaje_error("");
@@ -717,7 +722,7 @@ public final class ValidadorModoDireccionamiento {
 
         }
 
-        if ( operando.contains("+" ) || operando.contains("-") ) {
+        if ( tokensIDX[1].contains("+" ) || tokensIDX[1].contains("-") ) {
             reporte.setError(true);
             reporte.setMensaje_error(" El registro no se reconoce IDX pre / post");
             reporte.setModo_direccionamiento("IDX pre / post");
@@ -748,7 +753,7 @@ public final class ValidadorModoDireccionamiento {
             if( ( operando_dividido[0].equals( "A" )  || operando_dividido[0].equals( "B" )  || operando_dividido[0].equals( "D" ) ) && operando.length() > 1 ) {
                 for( short index = 0; index < REGISTROS_IDX.length; index++ ) {
                     if( operando_dividido[1].equals( REGISTROS_IDX[index] )  ) {
-                        reporte.setError( NI_MERGAS );
+                        reporte.setError( false );
                         reporte.setMensaje_error( "" );
                         reporte.setModo_direccionamiento("IDX acumulador");
                         return reporte;
@@ -761,7 +766,7 @@ public final class ValidadorModoDireccionamiento {
                 reporte.setError_final(true);
                 return reporte;
             }
-            reporte.setError(SIMON_QUE_SI);
+            reporte.setError(true);
             reporte.setMensaje_error( "  Acumulador es diferente a A,B y D" );
             reporte.setModo_direccionamiento("IDX acumulador");
             return reporte;
